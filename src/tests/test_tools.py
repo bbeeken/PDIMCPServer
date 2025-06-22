@@ -43,32 +43,19 @@ def load_server(monkeypatch):
         ("src.tools.sales.top_items", "top_items_tool"),
         ("src.tools.basket.basket_analysis", "basket_analysis_tool"),
         ("src.tools.basket.item_correlation", "item_correlation_tool"),
-        # newly implemented cross sell helper
-
-        ("src.tools.basket.basket_metrics", "basket_metrics_tool"),
         ("src.tools.basket.cross_sell", "cross_sell_opportunities_tool"),
         ("src.tools.analytics.hourly_sales", "hourly_sales_tool"),
-        ("src.tools.analytics.peak_hours", "peak_hours_tool"),
-        ("src.tools.analytics.product_velocity", "product_velocity_tool"),
-        ("src.tools.analytics.sales_anomalies", "sales_anomalies_tool"),
         ("src.tools.analytics.sales_gaps", "sales_gaps_tool"),
         ("src.tools.analytics.year_over_year", "year_over_year_tool"),
-        ("src.tools.analytics.low_movement", "low_movement_tool"),
-        ("src.tools.site_lookup", "site_lookup_tool"),
-        ("src.tools.basket.cross_sell", "cross_sell_opportunities_tool"),
-        ("src.tools.basket.cross_sell_opportunities", "cross_sell_opportunities_tool"),
-        ("src.tools.get_today_date", "get_today_date_tool"),
         ("src.tools.item_lookup", "item_lookup_tool"),
         ("src.tools.site_lookup", "site_lookup_tool"),
+        ("src.tools.get_today_date", "get_today_date_tool"),
     ]
 
     for path, attr in imports:
         mod = types.ModuleType(path)
         tool = Tool(name=attr)
         setattr(mod, attr, tool)
-        if path == "src.tools.basket.cross_sell" and attr == "cross_sell_tool":
-            # expose expected attribute for actual import path
-            setattr(mod, "cross_sell_opportunities_tool", tool)
         monkeypatch.setitem(sys.modules, path, mod)
 
     mcp_server = importlib.reload(importlib.import_module("src.mcp_server"))
@@ -79,5 +66,5 @@ def test_tool_registration(monkeypatch):
     mcp_server, DummyServer = load_server(monkeypatch)
     server = mcp_server.create_server()
     assert isinstance(server, DummyServer)
-    assert len(server.tools) == 10
+    assert len(server.tools) == 13
     assert all(hasattr(t, "name") for t in server.tools)
