@@ -26,9 +26,8 @@
         ],
         "analytics": [
           "hourly_sales",
-          "peak_hours",
-          "product_velocity",
-          "sales_anomalies"
+          "sales_gaps",
+          "year_over_year"
         ]
       }
     }
