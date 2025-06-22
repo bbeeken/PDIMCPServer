@@ -19,26 +19,16 @@ cd mcp-pdi-server
 ```
 
 
-## Running the FastAPI Server
+## Running the FastAPI server
 
-Install the dependencies and launch the HTTP server with `uvicorn`:
+Install the dependencies and start the HTTP API with `uvicorn`:
 
 ```bash
 pip install -r requirements.txt
-uvicorn src.fastapi_server:create_app --host 0.0.0.0 --port 8000
+uvicorn src.fastapi_server:create_app --host 0.0.0.0 --port 8000 --reload
 ```
 
 The server exposes two endpoints:
 * `GET /tools` - list available tools
 * `POST /call` - execute a tool by name
-
-## Running the FastAPI server
-
-Start the HTTP API using `uvicorn`:
-
-```bash
-uvicorn src.fastapi_server:app --reload
-```
-
-This exposes `/tools` for listing tools and `/call` to execute them.
 
