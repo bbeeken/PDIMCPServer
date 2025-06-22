@@ -22,6 +22,7 @@ from .tools.analytics.hourly_sales import hourly_sales_tool
 from .tools.analytics.peak_hours import peak_hours_tool
 from .tools.analytics.product_velocity import product_velocity_tool
 from .tools.analytics.sales_anomalies import sales_anomalies_tool
+from .tools.basket.cross_sell import cross_sell_opportunities_tool
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +56,7 @@ async def main():
         peak_hours_tool,
         product_velocity_tool,
         sales_anomalies_tool,
+        cross_sell_opportunities_tool,
     ]
     
     # Register handlers
