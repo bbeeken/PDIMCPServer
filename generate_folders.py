@@ -13,7 +13,6 @@ structure = {
         ".gitignore",
         "README.md",
         "requirements.txt",
-        "setup.py",
         "pyproject.toml",
         "package.json",
         "mcp_server.py",
