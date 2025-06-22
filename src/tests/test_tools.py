@@ -51,6 +51,9 @@ def load_server(monkeypatch):
         mod = types.ModuleType(path)
         tool = Tool(name=attr)
         setattr(mod, attr, tool)
+        if path == "src.tools.basket.cross_sell" and attr == "cross_sell_tool":
+            # expose expected attribute for actual import path
+            setattr(mod, "cross_sell_opportunities_tool", tool)
         monkeypatch.setitem(sys.modules, path, mod)
 
     mcp_server = importlib.reload(importlib.import_module("src.mcp_server"))
