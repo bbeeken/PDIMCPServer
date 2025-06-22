@@ -54,6 +54,7 @@ def load_server(monkeypatch):
         ("src.tools.analytics.low_movement", "low_movement_tool"),
         ("src.tools.site_lookup", "site_lookup_tool"),
         ("src.tools.basket.cross_sell", "cross_sell_opportunities_tool"),
+        ("src.tools.basket.cross_sell_opportunities", "cross_sell_opportunities_tool"),
         ("src.tools.get_today_date", "get_today_date_tool"),
         ("src.tools.item_lookup", "item_lookup_tool"),
         ("src.tools.site_lookup", "site_lookup_tool"),
