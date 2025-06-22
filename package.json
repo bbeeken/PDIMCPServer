@@ -25,10 +25,7 @@
           "cross_sell_opportunities"
         ],
         "analytics": [
-          "hourly_sales",
-          "peak_hours",
-          "product_velocity",
-          "sales_anomalies"
+          "hourly_sales"
         ]
       }
     }

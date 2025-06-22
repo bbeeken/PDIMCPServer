@@ -17,3 +17,13 @@ A Model Context Protocol (MCP) server providing real-time sales analytics tools 
 git clone <your-repo-url>
 cd mcp-pdi-server
 ```
+
+## Running the FastAPI server
+
+Start the HTTP API using `uvicorn`:
+
+```bash
+uvicorn src.fastapi_server:app --reload
+```
+
+This exposes `/tools` for listing tools and `/call` to execute them.
