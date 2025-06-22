@@ -2,8 +2,7 @@
 SQLAlchemy ORM models for PDI views
 """
 from sqlalchemy import Column, Integer, String, Float, DateTime, Date, Time, ForeignKey, Text
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, column_property
+from sqlalchemy.orm import declarative_base, relationship, column_property
 from sqlalchemy.sql import func
 
 Base = declarative_base()
