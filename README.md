@@ -18,6 +18,15 @@ git clone <your-repo-url>
 cd mcp-pdi-server
 ```
 
+## Database Setup
+
+Create a `.env` file based on `.env.example` and adjust the connection
+settings. The variables `DB_SERVER`, `DB_DATABASE`, `DB_USERNAME`,
+`DB_PASSWORD` and `DB_DRIVER` configure the SQL Server connection used by the
+application. Additional options like `POOL_SIZE` and `MAX_OVERFLOW` control
+connection pooling. See the example file for the full list of supported
+variables.
+
 
 ## Running the FastAPI server
 
