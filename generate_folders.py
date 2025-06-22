@@ -63,6 +63,7 @@ structure = {
     ],
 }
 
+
 def create_project_structure(base_name: str):
     base_path = Path(base_name)
     for folder, files in structure.items():
@@ -73,6 +74,6 @@ def create_project_structure(base_name: str):
             file_path.touch(exist_ok=True)
     print(f"Project structure for '{base_name}' has been created.")
 
+
 if __name__ == "__main__":
     create_project_structure("mcp-pdi-server")
-

@@ -1,8 +1,10 @@
 """Market basket analysis tool"""
+
 from typing import Dict, Any, Optional
 from mcp.types import Tool
 from ...db.session import get_db
 from ..utils import format_date, format_response, execute_sql
+
 
 async def basket_analysis_impl(
     start_date: str,
@@ -10,7 +12,7 @@ async def basket_analysis_impl(
     min_support: float = 0.01,
     min_confidence: float = 0.5,
     site_id: Optional[int] = None,
-    max_items: int = 50
+    max_items: int = 50,
 ) -> Dict[str, Any]:
     """Find frequently bought together items with lift analysis"""
     query = """
@@ -20,13 +22,13 @@ async def basket_analysis_impl(
         WHERE SaleDate BETWEEN :start_date AND :end_date
     """
     params = {
-        'start_date': format_date(start_date),
-        'end_date': format_date(end_date),
-        'max_items': max_items
+        "start_date": format_date(start_date),
+        "end_date": format_date(end_date),
+        "max_items": max_items,
     }
     if site_id:
         query += " AND SiteID = :site_id"
-        params['site_id'] = site_id
+        params["site_id"] = site_id
     query += """
     ),
     TxCount AS (
@@ -75,38 +77,42 @@ async def basket_analysis_impl(
         AND CAST(p.pair_count AS FLOAT)/s1.support_count >= :min_confidence
     ORDER BY lift DESC
     """
-    params['min_support'] = min_support
-    params['min_confidence'] = min_confidence
+    params["min_support"] = min_support
+    params["min_confidence"] = min_confidence
 
     try:
         with get_db() as db:
             data = execute_sql(db, query, params)
             results = []
             for row in data:
-                results.append({
-                    'item1': {'id': row['item1_id'], 'name': row['item1_name']},
-                    'item2': {'id': row['item2_id'], 'name': row['item2_name']},
-                    'metrics': {
-                        'support': round(row['support'], 4),
-                        'confidence': round(row['confidence'], 3),
-                        'lift': row['lift'],
-                        'frequency': row['pair_count']
+                results.append(
+                    {
+                        "item1": {"id": row["item1_id"], "name": row["item1_name"]},
+                        "item2": {"id": row["item2_id"], "name": row["item2_name"]},
+                        "metrics": {
+                            "support": round(row["support"], 4),
+                            "confidence": round(row["confidence"], 3),
+                            "lift": row["lift"],
+                            "frequency": row["pair_count"],
+                        },
                     }
-                })
+                )
             return format_response(
                 success=True,
                 data=results,
                 debug_sql=query,
                 metadata={
-                    'parameters': {
-                        'min_support': min_support,
-                        'min_confidence': min_confidence,
-                        'date_range': f"{start_date} to {end_date}",
-                        'site_id': site_id
+                    "parameters": {
+                        "min_support": min_support,
+                        "min_confidence": min_confidence,
+                        "date_range": f"{start_date} to {end_date}",
+                        "site_id": site_id,
                     }
-                })
+                },
+            )
     except Exception as e:
         return format_response(success=False, data=[], debug_sql=query, error=str(e))
+
 
 basket_analysis_tool = Tool(
     name="basket_analysis",
@@ -116,12 +122,18 @@ basket_analysis_tool = Tool(
         "properties": {
             "start_date": {"type": "string", "description": "Start date (YYYY-MM-DD)"},
             "end_date": {"type": "string", "description": "End date (YYYY-MM-DD)"},
-            "min_support": {"type": "number", "description": "Minimum support threshold"},
-            "min_confidence": {"type": "number", "description": "Minimum confidence threshold"},
+            "min_support": {
+                "type": "number",
+                "description": "Minimum support threshold",
+            },
+            "min_confidence": {
+                "type": "number",
+                "description": "Minimum confidence threshold",
+            },
             "site_id": {"type": "integer", "description": "Filter by site ID"},
-            "max_items": {"type": "integer", "description": "Maximum pairs to return"}
+            "max_items": {"type": "integer", "description": "Maximum pairs to return"},
         },
-        "required": ["start_date", "end_date"]
-    }
+        "required": ["start_date", "end_date"],
+    },
 )
 basket_analysis_tool._implementation = basket_analysis_impl

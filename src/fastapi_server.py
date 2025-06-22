@@ -46,9 +46,11 @@ TOOLS: List[Tool] = [
 
 tool_map = {t.name: t for t in TOOLS}
 
+
 class CallRequest(BaseModel):
     name: str
     arguments: Dict[str, Any] = {}
+
 
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
@@ -65,11 +67,14 @@ def create_app() -> FastAPI:
             raise HTTPException(status_code=404, detail=f"Unknown tool: {req.name}")
         tool = tool_map[req.name]
         if not hasattr(tool, "_implementation"):
-            raise HTTPException(status_code=500, detail=f"Tool {req.name} has no implementation")
+            raise HTTPException(
+                status_code=500, detail=f"Tool {req.name} has no implementation"
+            )
         try:
             result = await tool._implementation(**req.arguments)
             if isinstance(result, dict):
                 import json
+
                 formatted = json.dumps(result, indent=2, default=str)
             else:
                 formatted = str(result)
@@ -79,6 +84,7 @@ def create_app() -> FastAPI:
             raise HTTPException(status_code=500, detail=str(exc))
 
     return app
+
 
 def main() -> None:
     """Run the FastAPI server using uvicorn."""
@@ -90,6 +96,7 @@ def main() -> None:
         port=int(os.getenv("PORT", "8000")),
         reload=False,
     )
+
 
 if __name__ == "__main__":
     main()
