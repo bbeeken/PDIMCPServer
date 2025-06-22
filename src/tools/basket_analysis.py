@@ -1,5 +1,6 @@
 """Market basket analysis tool"""
 from typing import Dict, Any, Optional
+from sqlalchemy import text
 from mcp.types import Tool
 from ...db.connection import get_db
 from ..utils import format_date, format_response, execute_sql
@@ -13,20 +14,24 @@ async def basket_analysis_impl(
     max_items: int = 50
 ) -> Dict[str, Any]:
     """Find frequently bought together items with lift analysis"""
+
     query = """
     WITH TxItems AS (
         SELECT DISTINCT TransactionID, ItemID, ItemName
         FROM dbo.V_LLM_SalesFact
         WHERE SaleDate BETWEEN :start_date AND :end_date
     """
+
     params = {
         'start_date': format_date(start_date),
         'end_date': format_date(end_date),
         'max_items': max_items
     }
+
     if site_id:
         query += " AND SiteID = :site_id"
         params['site_id'] = site_id
+
     query += """
     ),
     TxCount AS (
@@ -34,12 +39,17 @@ async def basket_analysis_impl(
         FROM dbo.V_LLM_SalesFact
         WHERE SaleDate BETWEEN :start_date AND :end_date
     """
+
     if site_id:
         query += " AND SiteID = :site_id"
+
     query += """
     ),
     ItemSupport AS (
-        SELECT ItemID, ItemName, COUNT(DISTINCT TransactionID) AS support_count
+        SELECT
+            ItemID,
+            ItemName,
+            COUNT(DISTINCT TransactionID) AS support_count
         FROM TxItems
         GROUP BY ItemID, ItemName
     ),
@@ -55,37 +65,50 @@ async def basket_analysis_impl(
         GROUP BY a.ItemID, a.ItemName, b.ItemID, b.ItemName
     )
     SELECT TOP (:max_items)
-        p.item1_id, p.item1_name,
-        p.item2_id, p.item2_name,
+        p.item1_id,
+        p.item1_name,
+        p.item2_id,
+        p.item2_name,
         p.pair_count,
         t.total_transactions,
         s1.support_count AS item1_count,
         s2.support_count AS item2_count,
-        CAST(p.pair_count AS FLOAT)/t.total_transactions AS support,
-        CAST(p.pair_count AS FLOAT)/s1.support_count AS confidence,
+        CAST(p.pair_count AS FLOAT) / t.total_transactions AS support,
+        CAST(p.pair_count AS FLOAT) / s1.support_count AS confidence,
         ROUND(
-            (CAST(p.pair_count AS FLOAT) * t.total_transactions) /
-            (s1.support_count * s2.support_count), 2) AS lift
+            (CAST(p.pair_count AS FLOAT) * t.total_transactions) / 
+            (s1.support_count * s2.support_count), 
+            2
+        ) AS lift
     FROM ItemPairs p
     CROSS JOIN TxCount t
     JOIN ItemSupport s1 ON p.item1_id = s1.ItemID
     JOIN ItemSupport s2 ON p.item2_id = s2.ItemID
-    WHERE
-        CAST(p.pair_count AS FLOAT)/t.total_transactions >= :min_support
-        AND CAST(p.pair_count AS FLOAT)/s1.support_count >= :min_confidence
+    WHERE 
+        CAST(p.pair_count AS FLOAT) / t.total_transactions >= :min_support
+        AND CAST(p.pair_count AS FLOAT) / s1.support_count >= :min_confidence
     ORDER BY lift DESC
     """
+
     params['min_support'] = min_support
     params['min_confidence'] = min_confidence
 
     try:
         with get_db() as db:
             data = execute_sql(db, query, params)
+
+            # Format results
             results = []
             for row in data:
                 results.append({
-                    'item1': {'id': row['item1_id'], 'name': row['item1_name']},
-                    'item2': {'id': row['item2_id'], 'name': row['item2_name']},
+                    'item1': {
+                        'id': row['item1_id'],
+                        'name': row['item1_name']
+                    },
+                    'item2': {
+                        'id': row['item2_id'],
+                        'name': row['item2_name']
+                    },
                     'metrics': {
                         'support': round(row['support'], 4),
                         'confidence': round(row['confidence'], 3),
@@ -93,6 +116,7 @@ async def basket_analysis_impl(
                         'frequency': row['pair_count']
                     }
                 })
+
             return format_response(
                 success=True,
                 data=results,
@@ -104,10 +128,17 @@ async def basket_analysis_impl(
                         'date_range': f"{start_date} to {end_date}",
                         'site_id': site_id
                     }
-                })
+                }
+            )
     except Exception as e:
-        return format_response(success=False, data=[], debug_sql=query, error=str(e))
+        return format_response(
+            success=False,
+            data=[],
+            debug_sql=query,
+            error=str(e)
+        )
 
+# Tool definition
 basket_analysis_tool = Tool(
     name="basket_analysis",
     description="Find frequently bought together items with support, confidence, and lift metrics",
@@ -116,12 +147,13 @@ basket_analysis_tool = Tool(
         "properties": {
             "start_date": {"type": "string", "description": "Start date (YYYY-MM-DD)"},
             "end_date": {"type": "string", "description": "End date (YYYY-MM-DD)"},
-            "min_support": {"type": "number", "description": "Minimum support threshold"},
-            "min_confidence": {"type": "number", "description": "Minimum confidence threshold"},
+            "min_support": {"type": "number", "description": "Minimum support threshold (default: 0.01)"},
+            "min_confidence": {"type": "number", "description": "Minimum confidence threshold (default: 0.5)"},
             "site_id": {"type": "integer", "description": "Filter by site ID"},
-            "max_items": {"type": "integer", "description": "Maximum pairs to return"}
+            "max_items": {"type": "integer", "description": "Maximum pairs to return (default: 50)"}
         },
         "required": ["start_date", "end_date"]
     }
 )
+
 basket_analysis_tool._implementation = basket_analysis_impl
