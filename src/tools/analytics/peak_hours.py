@@ -1,18 +1,9 @@
-"""Find the hours of the day with the highest sales volume.
+"""Find the hours of the day with the highest sales volume."""
 
-This module will eventually analyze transaction data to determine the busiest
-times of day.  For now it contains a small stub that simply reports that the
-feature has not been implemented yet.
-"""
-
-from typing import Any, Dict, Optional
-
-from mcp.types import Tool
-
-
-"""Determine hours with the highest sales."""
 from typing import Optional, Dict, Any, List
+
 from mcp.types import Tool
+
 from ...db.connection import execute_query
 from ...db.models import SALES_FACT_VIEW
 from ..utils import validate_date_range, create_tool_response
@@ -22,31 +13,6 @@ async def peak_hours_impl(
     start_date: str,
     end_date: str,
     site_id: Optional[int] = None,
-
-) -> Dict[str, Any]:
-    """Placeholder implementation for future peak hour analytics."""
-
-    return {
-        "success": False,
-        "error": "peak_hours tool not yet implemented",
-        "parameters": {
-            "start_date": start_date,
-            "end_date": end_date,
-            "site_id": site_id,
-        },
-    }
-
-
-peak_hours_tool = Tool(
-    name="peak_hours",
-    description="Determine peak sales hours (stub)",
-    inputSchema={
-        "type": "object",
-        "properties": {
-            "start_date": {"type": "string", "description": "Start date"},
-            "end_date": {"type": "string", "description": "End date"},
-            "site_id": {"type": "integer", "description": "Optional site filter"},
-
     top_n: int = 5,
 ) -> Dict[str, Any]:
     """Return the top ``top_n`` hours by total sales."""
@@ -74,8 +40,9 @@ peak_hours_tool = Tool(
             "top_n": top_n,
         }
         return create_tool_response(results, sql, params, metadata)
-    except Exception as e:
+    except Exception as e:  # pragma: no cover - db errors depend on env
         return create_tool_response([], sql, params, error=str(e))
+
 
 peak_hours_tool = Tool(
     name="peak_hours",
@@ -86,8 +53,11 @@ peak_hours_tool = Tool(
             "start_date": {"type": "string", "description": "Start date (YYYY-MM-DD)"},
             "end_date": {"type": "string", "description": "End date (YYYY-MM-DD)"},
             "site_id": {"type": "integer", "description": "Optional site filter"},
-            "top_n": {"type": "integer", "default": 5, "description": "Number of hours to return"},
-
+            "top_n": {
+                "type": "integer",
+                "default": 5,
+                "description": "Number of hours to return",
+            },
         },
         "required": ["start_date", "end_date"],
     },

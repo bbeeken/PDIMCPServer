@@ -1,19 +1,9 @@
-
-"""Identify items with unusually low sales activity (stub).
-
-This analytic will flag products that have very little movement compared to
-their historical averages.  The implementation is left for a future
-development phase when appropriate business rules are finalized.
-"""
-
-from typing import Any, Dict, Optional
-
-from mcp.types import Tool
-
-
 """Identify slow-moving items based on quantity sold."""
+
 from typing import Optional, Dict, Any, List
+
 from mcp.types import Tool
+
 from ...db.connection import execute_query
 from ...db.models import SALES_FACT_VIEW
 from ..utils import validate_date_range, create_tool_response
@@ -22,31 +12,6 @@ from ..utils import validate_date_range, create_tool_response
 async def low_movement_impl(
     start_date: str,
     end_date: str,
-
-    site_id: Optional[int] = None,
-) -> Dict[str, Any]:
-    """Placeholder implementation that simply acknowledges the call."""
-
-    return {
-        "success": False,
-        "error": "low_movement tool not yet implemented",
-        "parameters": {
-            "start_date": start_date,
-            "end_date": end_date,
-            "site_id": site_id,
-        },
-    }
-
-
-low_movement_tool = Tool(
-    name="low_movement",
-    description="Detect items with low movement compared to norms (stub)",
-    inputSchema={
-        "type": "object",
-        "properties": {
-            "start_date": {"type": "string", "description": "Start date"},
-            "end_date": {"type": "string", "description": "End date"},
-
     threshold: int = 10,
     site_id: Optional[int] = None,
 ) -> Dict[str, Any]:
@@ -71,8 +36,9 @@ low_movement_tool = Tool(
             "site_id": site_id,
         }
         return create_tool_response(results, sql, params, metadata)
-    except Exception as e:
+    except Exception as e:  # pragma: no cover - db errors depend on env
         return create_tool_response([], sql, params, error=str(e))
+
 
 low_movement_tool = Tool(
     name="low_movement",
@@ -82,8 +48,11 @@ low_movement_tool = Tool(
         "properties": {
             "start_date": {"type": "string", "description": "Start date (YYYY-MM-DD)"},
             "end_date": {"type": "string", "description": "End date (YYYY-MM-DD)"},
-            "threshold": {"type": "integer", "default": 10, "description": "Maximum quantity sold"},
-
+            "threshold": {
+                "type": "integer",
+                "default": 10,
+                "description": "Maximum quantity sold",
+            },
             "site_id": {"type": "integer", "description": "Optional site filter"},
         },
         "required": ["start_date", "end_date"],
