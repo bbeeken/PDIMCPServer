@@ -23,6 +23,7 @@ def load_connection(monkeypatch):
             self.conn.commit()
 
     pyodbc.connect = lambda *_args, **_kw: DummyConnection()
+    pyodbc.paramstyle = "qmark"
     dotenv = types.ModuleType("dotenv")
     dotenv.load_dotenv = lambda: None
 

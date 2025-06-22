@@ -10,6 +10,7 @@ from .tools.sales.sales_trend import sales_trend_tool
 from .tools.sales.top_items import top_items_tool
 from .tools.basket.basket_analysis import basket_analysis_tool
 from .tools.basket.item_correlation import item_correlation_tool
+from .tools.basket.basket_metrics import basket_metrics_tool
 from .tools.basket.cross_sell import cross_sell_opportunities_tool
 from .tools.analytics.hourly_sales import hourly_sales_tool
 from .tools.analytics.sales_gaps import sales_gaps_tool
@@ -33,6 +34,7 @@ def create_server() -> Server:
         # Basket analysis
         basket_analysis_tool,
         item_correlation_tool,
+        basket_metrics_tool,
         cross_sell_opportunities_tool,
 
         # Analytics

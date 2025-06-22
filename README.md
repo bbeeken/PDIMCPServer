@@ -32,13 +32,3 @@ The server exposes two endpoints:
 * `GET /tools` - list available tools
 * `POST /call` - execute a tool by name
 
-## Running the FastAPI server
-
-Start the HTTP API using `uvicorn`:
-
-```bash
-uvicorn src.fastapi_server:app --reload
-```
-
-This exposes `/tools` for listing tools and `/call` to execute them.
-
