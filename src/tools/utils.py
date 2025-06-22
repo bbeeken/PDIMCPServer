@@ -5,6 +5,7 @@ import json
 from datetime import datetime, date
 from typing import Any, List, Dict, Optional
 import logging
+from sqlalchemy import text
 
 logger = logging.getLogger(__name__)
 
@@ -97,5 +98,41 @@ def validate_date_range(start_date: str, end_date: str) -> tuple[str, str]:
     # Check reasonable range (e.g., max 1 year)
     if (end_dt - start_dt).days > 365:
         logger.warning(f"Large date range requested: {(end_dt - start_dt).days} days")
-    
+
     return start, end
+
+
+def format_response(
+    success: bool,
+    data: Any,
+    debug_sql: str,
+    metadata: Optional[Dict[str, Any]] = None,
+    error: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Create a response dictionary for older basket tools."""
+
+    response = {
+        "success": success,
+        "data": data,
+        "debug_sql": debug_sql,
+        "timestamp": datetime.now().isoformat(),
+        "row_count": len(data) if isinstance(data, list) else 1,
+    }
+
+    if metadata:
+        response["metadata"] = metadata
+
+    if error:
+        response["error"] = error
+
+    return response
+
+
+def execute_sql(db_session, sql: str, params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
+    """Execute a SQL statement using an SQLAlchemy session."""
+
+    result = db_session.execute(text(sql), params or {})
+    rows = result.fetchall()
+    columns = result.keys()
+
+    return [dict(zip(columns, row)) for row in rows]
