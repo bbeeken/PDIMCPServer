@@ -6,6 +6,7 @@ from ...db.connection import execute_query
 from ...db.models import SALES_FACT_VIEW
 from ..utils import validate_date_range, create_tool_response
 
+
 async def hourly_sales_impl(
     start_date: str,
     end_date: str,
@@ -33,6 +34,7 @@ async def hourly_sales_impl(
         return create_tool_response(results, sql, params, metadata)
     except Exception as e:  # pragma: no cover - db errors depend on env
         return create_tool_response([], sql, params, error=str(e))
+
 
 hourly_sales_tool = Tool(
     name="hourly_sales",

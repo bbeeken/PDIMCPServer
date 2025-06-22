@@ -68,7 +68,9 @@ async def cross_sell_opportunities_impl(
 
         return create_tool_response(results, sql, params, metadata)
 
-    except Exception as e:  # pragma: no cover - database errors are environment specific
+    except (
+        Exception
+    ) as e:  # pragma: no cover - database errors are environment specific
         return create_tool_response([], sql, params, error=str(e))
 
 
@@ -82,7 +84,11 @@ cross_sell_opportunities_tool = Tool(
             "start_date": {"type": "string", "description": "Start date (YYYY-MM-DD)"},
             "end_date": {"type": "string", "description": "End date (YYYY-MM-DD)"},
             "site_id": {"type": "integer", "description": "Optional site filter"},
-            "top_n": {"type": "integer", "description": "Maximum items to return", "default": 10},
+            "top_n": {
+                "type": "integer",
+                "description": "Maximum items to return",
+                "default": 10,
+            },
         },
         "required": ["item_id", "start_date", "end_date"],
     },
@@ -92,4 +98,3 @@ cross_sell_opportunities_tool._implementation = cross_sell_opportunities_impl
 
 
 cross_sell_tool = cross_sell_opportunities_tool
-
