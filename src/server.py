@@ -17,6 +17,8 @@ from .tools.sales.top_items import top_items_tool
 from .tools.basket.basket_analysis import basket_analysis_tool
 from .tools.basket.item_correlation import item_correlation_tool
 from .tools.basket.cross_sell import cross_sell_opportunities_tool
+from .tools.item_lookup import item_lookup_tool
+from .tools.site_lookup import site_lookup_tool
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +45,8 @@ async def main():
         basket_analysis_tool,
         item_correlation_tool,
         cross_sell_opportunities_tool,
+        item_lookup_tool,
+        site_lookup_tool,
     ]
     
     # Register handlers
