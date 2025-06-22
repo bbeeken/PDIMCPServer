@@ -38,6 +38,8 @@ pip install -r requirements.txt
 uvicorn src.fastapi_server:create_app --host 0.0.0.0 --port 8000 --reload
 ```
 
+Set `MCP_API_URL` if the API is not running on the default `http://localhost:8000`.
+
 The server exposes two endpoints:
 * `GET /tools` - list available tools
 * `POST /call` - execute a tool by name
