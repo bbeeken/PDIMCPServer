@@ -52,16 +52,10 @@ streamlit run streamlit_app.py
 
 Set `MCP_API_URL` if the API is not running on the default `http://localhost:8000`.
 
-### Chat interface
-
-Launch an experimental ChatGPT-style UI backed by a local Ollama model:
-
-```bash
-streamlit run streamlit_chat.py
-```
-
-Set `OLLAMA_MODEL` to choose the model name and `OLLAMA_HOST` if the Ollama server
-is not running on `http://localhost:11434`.
+Navigate to the **Chat** page in the Streamlit sidebar for an experimental
+ChatGPT‑style UI backed by a local Ollama model. Set `OLLAMA_MODEL` to choose
+the model name and `OLLAMA_HOST` if the Ollama server is not running on
+`http://localhost:11434`.
 
 ## Smoke testing
 
