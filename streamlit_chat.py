@@ -5,6 +5,9 @@ import ollama
 MODEL = os.getenv("OLLAMA_MODEL", "llama3")
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 
+# create a reusable Ollama client for requests
+_ollama_client = ollama.Client(host=OLLAMA_HOST)
+
 st.set_page_config(page_title="MCP Chat", page_icon="💬")
 
 if "messages" not in st.session_state:
@@ -23,10 +26,9 @@ if prompt:
     st.chat_message("user").write(prompt)
     with st.chat_message("assistant"):
         try:
-            response = ollama.chat(
+            response = _ollama_client.chat(
                 model=MODEL,
                 messages=st.session_state.messages,
-                host=OLLAMA_HOST,
             )
             content = response["message"]["content"]
         except Exception as exc:  # pragma: no cover - external service
