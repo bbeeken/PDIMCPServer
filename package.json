@@ -1,0 +1,35 @@
+{
+    "name": "mcp-pdi-server",
+    "version": "1.0.0",
+    "description": "MCP server for PDI sales analytics",
+    "main": "mcp_server.py",
+    "scripts": {
+      "start": "python mcp_server.py",
+      "test": "pytest",
+      "validate": "python scripts/validate_db.py"
+    },
+    "mcp": {
+      "name": "pdi-sales",
+      "description": "Real-time sales analytics for PDI Enterprise",
+      "tools": {
+        "sales": [
+          "query_sales_realtime",
+          "sales_summary",
+          "sales_trend",
+          "top_items"
+        ],
+        "basket": [
+          "basket_analysis",
+          "item_correlation",
+          "basket_metrics",
+          "cross_sell_opportunities"
+        ],
+        "analytics": [
+          "hourly_sales",
+          "peak_hours",
+          "product_velocity",
+          "sales_anomalies"
+        ]
+      }
+    }
+  }

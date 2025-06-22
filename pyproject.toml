@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcp-pdi-server"
+version = "1.0.0"
+description = "MCP server for PDI sales analytics"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "mcp>=0.9.0",
+    "pyodbc>=5.0.1",
+    "pandas>=2.1.4",
+    "numpy>=1.26.2",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.3",
+    "pytest-asyncio>=0.21.1",
+    "black>=23.12.1",
+    "mypy>=1.7.1",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py38', 'py39', 'py310', 'py311']
+
+[tool.mypy]
+python_version = "3.8"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
