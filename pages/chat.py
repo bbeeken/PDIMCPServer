@@ -16,15 +16,30 @@ st.set_page_config(page_title="MCP Chat", page_icon="💬", layout="wide")
 st.markdown(
     """
     <style>
+    .user-msg,
+    .assistant-msg {
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        margin: 0.25rem 0;
+        max-width: 60ch;
+        font-family: "Segoe UI", Arial, sans-serif;
+        font-size: 1rem;
+        line-height: 1.4;
+    }
     .user-msg {
         background-color: #DCF8C6;
-        padding: 0.5rem;
-        border-radius: 0.5rem;
+        border: 1px solid #cbe5b9;
+        margin-left: auto;
     }
     .assistant-msg {
-        background-color: #FFF;
-        padding: 0.5rem;
-        border-radius: 0.5rem;
+        background-color: #F7F7F8;
+        border: 1px solid #e4e4e5;
+        margin-right: auto;
+    }
+    .user-msg code,
+    .assistant-msg code {
+        font-family: "Courier New", monospace;
+        font-size: 0.9rem;
     }
     div[data-testid="stChatMessage"] div[data-testid="stMarkdownContainer"] {
         font-size: 1rem;
@@ -40,6 +55,18 @@ if "messages" not in st.session_state:
     ]
 
 st.title("MCP Chat (Ollama)")
+
+
+def scroll_to_bottom() -> None:
+    """Scroll the page to the bottom using JavaScript."""
+    st.markdown(
+        """
+        <script>
+        window.scrollTo(0, document.body.scrollHeight);
+        </script>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def render_message(content: str) -> None:
@@ -76,13 +103,16 @@ for msg in st.session_state.messages:
         st.markdown(f'<div class="{css}">', unsafe_allow_html=True)
         render_message(msg["content"])
         st.markdown("</div>", unsafe_allow_html=True)
+scroll_to_bottom()
 
 prompt = st.chat_input("Ask something...")
 if prompt:
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(f'<div class="user-msg">{prompt}</div>', unsafe_allow_html=True)
+    scroll_to_bottom()
     with st.chat_message("assistant"):
+        st.markdown('<div class="assistant-msg">', unsafe_allow_html=True)
         try:
             response_stream = ollama.chat(
                 model=MODEL,
@@ -96,6 +126,7 @@ if prompt:
                 part = chunk["message"]["content"]
                 chunks.append(part)
                 placeholder.markdown("".join(chunks))
+                scroll_to_bottom()
             content = "".join(chunks)
         except Exception as exc:  # pragma: no cover - external service
             st.error(f"Error contacting Ollama: {exc}")
@@ -103,7 +134,10 @@ if prompt:
         if content:
             st.session_state.messages.append({"role": "assistant", "content": content})
             placeholder.empty()
-            with placeholder.container():
-                st.markdown('<div class="assistant-msg">', unsafe_allow_html=True)
-                render_message(content)
-                st.markdown('</div>', unsafe_allow_html=True)
+
+            render_message(content)
+
+            st.markdown('</div>', unsafe_allow_html=True)
+            scroll_to_bottom()
+
+
