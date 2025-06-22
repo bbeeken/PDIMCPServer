@@ -72,15 +72,6 @@ def create_app() -> FastAPI:
             )
         try:
             result = await tool._implementation(**req.arguments)
-
-            if isinstance(result, dict):
-                import json
-
-                formatted = json.dumps(result, indent=2, default=str)
-            else:
-                formatted = str(result)
-            return [TextContent(type="text", text=formatted)]
-
             return result
 
         except Exception as exc:  # pragma: no cover - safety net

@@ -8,7 +8,7 @@ from typing import Any, Dict, List
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
-from mcp.types import Tool
+from mcp.types import Tool, TextContent
 
 from .tools.sales.query_realtime import query_sales_realtime_tool
 from .tools.sales.sales_summary import sales_summary_tool
@@ -108,18 +108,6 @@ async def main():
             error_msg = f"Error executing {name}: {str(e)}"
             logger.error(error_msg, exc_info=True)
             return [TextContent(type="text", text=error_msg)]
-
-
-                return result
-            else:
-                error_msg = f"Tool {name} has no implementation"
-                logger.error(error_msg)
-                return {"error": error_msg}
-                
-        except Exception as e:
-            error_msg = f"Error executing {name}: {str(e)}"
-            logger.error(error_msg, exc_info=True)
-            return {"error": error_msg}
     
 
     # Run the server
