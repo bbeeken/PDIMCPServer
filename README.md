@@ -50,3 +50,19 @@ To verify the MCP server can be created without starting the HTTP API run:
 python scripts/smoke_test_server.py
 ```
 
+
+## Streamlit frontend
+
+A Streamlit interface is provided for quick visualization of analytics results.
+After installing the dependencies you can launch it with:
+
+```bash
+streamlit run path/to/your_app.py
+```
+
+The frontend now includes options for viewing charts and exporting data:
+
+- **Graphing** – Result tables can be displayed as bar or line graphs.
+  Use the graph toggle to switch between tabular and visual views.
+- **CSV Export** – Each table includes a **Download CSV** button
+  for saving the query results for further analysis.
