@@ -44,7 +44,7 @@ st.title("MCP Chat (Ollama)")
 
 def render_message(content: str) -> None:
     """Render a chat message supporting code blocks and charts."""
-    pattern = re.compile(r"```(\w+)?\n(.*?)```", re.DOTALL)
+    pattern = re.compile(r"```(\w+)?[ \t]*\n?(.*?)```", re.DOTALL)
     pos = 0
     for match in pattern.finditer(content):
         st.markdown(content[pos : match.start()])
@@ -103,6 +103,7 @@ if prompt:
         if content:
             st.session_state.messages.append({"role": "assistant", "content": content})
             placeholder.empty()
-            st.markdown('<div class="assistant-msg">', unsafe_allow_html=True)
-            render_message(content)
-            st.markdown('</div>', unsafe_allow_html=True)
+            with placeholder.container():
+                st.markdown('<div class="assistant-msg">', unsafe_allow_html=True)
+                render_message(content)
+                st.markdown('</div>', unsafe_allow_html=True)
