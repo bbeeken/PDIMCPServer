@@ -14,9 +14,11 @@ dependencies = [
     "pandas>=2.1.4",
     "numpy>=1.26.2",
     "python-dotenv>=1.0.0",
+
     "fastapi>=0.115.1",
     "uvicorn>=0.34.0",
     "httpx>=0.26.0",
+
     "fastapi>=0.110.0",
     "uvicorn>=0.23.2",
 ]
