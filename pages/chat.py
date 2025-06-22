@@ -57,6 +57,18 @@ if "messages" not in st.session_state:
 st.title("MCP Chat (Ollama)")
 
 
+def scroll_to_bottom() -> None:
+    """Scroll the page to the bottom using JavaScript."""
+    st.markdown(
+        """
+        <script>
+        window.scrollTo(0, document.body.scrollHeight);
+        </script>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def render_message(content: str) -> None:
     """Render a chat message supporting code blocks and charts."""
     pattern = re.compile(r"```(\w+)?\n(.*?)```", re.DOTALL)
@@ -91,12 +103,14 @@ for msg in st.session_state.messages:
         st.markdown(f'<div class="{css}">', unsafe_allow_html=True)
         render_message(msg["content"])
         st.markdown("</div>", unsafe_allow_html=True)
+scroll_to_bottom()
 
 prompt = st.chat_input("Ask something...")
 if prompt:
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(f'<div class="user-msg">{prompt}</div>', unsafe_allow_html=True)
+    scroll_to_bottom()
     with st.chat_message("assistant"):
         st.markdown('<div class="assistant-msg">', unsafe_allow_html=True)
         try:
@@ -112,6 +126,7 @@ if prompt:
                 part = chunk["message"]["content"]
                 chunks.append(part)
                 placeholder.markdown("".join(chunks))
+                scroll_to_bottom()
             content = "".join(chunks)
         except Exception as exc:  # pragma: no cover - external service
             st.error(f"Error contacting Ollama: {exc}")
@@ -120,4 +135,7 @@ if prompt:
             st.session_state.messages.append({"role": "assistant", "content": content})
             placeholder.empty()
             render_message(content)
-        st.markdown("</div>", unsafe_allow_html=True)
+
+            st.markdown('</div>', unsafe_allow_html=True)
+            scroll_to_bottom()
+
