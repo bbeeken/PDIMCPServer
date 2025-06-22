@@ -42,6 +42,16 @@ The server exposes two endpoints:
 * `GET /tools` - list available tools
 * `POST /call` - execute a tool by name
 
+## Streamlit frontend
+
+Run a lightweight UI to interact with the API:
+
+```bash
+streamlit run streamlit_app.py
+```
+
+Set `MCP_API_URL` if the API is not running on the default `http://localhost:8000`.
+
 ## Smoke testing
 
 To verify the MCP server can be created without starting the HTTP API run:
