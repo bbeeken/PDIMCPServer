@@ -1,36 +1,19 @@
 import importlib
-import sqlite3
 import sys
 import types
 
 
 def load_connection(monkeypatch):
-    """Load src.db.connection with a stubbed pyodbc module using SQLite."""
-    pyodbc = types.ModuleType("pyodbc")
+    """Load ``src.db.connection`` using an in-memory SQLite engine."""
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///:memory:")
 
-    class DummyConnection:
-        def __init__(self):
-            self.conn = sqlite3.connect(":memory:")
-            self.autocommit = False
-
-        def cursor(self):
-            return self.conn.cursor()
-
-        def close(self):
-            self.conn.close()
-
-        def commit(self):
-            self.conn.commit()
-
-    pyodbc.connect = lambda *_args, **_kw: DummyConnection()
     dotenv = types.ModuleType("dotenv")
     dotenv.load_dotenv = lambda: None
-
-    monkeypatch.setitem(sys.modules, "pyodbc", pyodbc)
     monkeypatch.setitem(sys.modules, "dotenv", dotenv)
 
+    importlib.reload(importlib.import_module("src.db.engine"))
+    importlib.reload(importlib.import_module("src.db.session"))
     module = importlib.reload(importlib.import_module("src.db.connection"))
-    module._connection_pool.clear()
     return module
 
 
