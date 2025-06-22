@@ -5,7 +5,7 @@ from typing import TypeVar, Generic, Type, Optional, List, Dict, Any
 from datetime import date, datetime
 from sqlalchemy.orm import Session, Query
 from sqlalchemy import and_, or_, func
-from ..database.models import Base
+from ..db.models import Base
 
 ModelType = TypeVar("ModelType", bound=Base)
 

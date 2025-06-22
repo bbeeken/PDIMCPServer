@@ -5,7 +5,7 @@ from typing import Optional, List, Dict, Any
 from datetime import date, datetime
 from sqlalchemy import func, and_, or_, desc
 from sqlalchemy.orm import Session
-from ..database.models import SalesFact, Product, Organization
+from ..db.models import SalesFact, Product, Organization
 from .base import BaseRepository
 
 class SalesRepository(BaseRepository[SalesFact]):
