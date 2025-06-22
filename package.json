@@ -6,7 +6,8 @@
     "scripts": {
       "start": "python mcp_server.py",
       "test": "pytest",
-      "validate": "python scripts/validate_db.py"
+      "validate": "python scripts/validate_db.py",
+      "smoke": "python scripts/smoke_test_server.py"
     },
     "mcp": {
       "name": "pdi-sales",
