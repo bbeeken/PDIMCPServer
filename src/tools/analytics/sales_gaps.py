@@ -7,6 +7,7 @@ from ...db.connection import execute_query
 from ...db.models import SALES_FACT_VIEW
 from ..utils import validate_date_range, create_tool_response
 
+
 async def sales_gaps_impl(
     start_date: str,
     end_date: str,
@@ -21,9 +22,9 @@ async def sales_gaps_impl(
         params.append(site_id)
     try:
         rows = execute_query(sql, params)
-        sold_dates = {row['SaleDate'] for row in rows}
-        start_dt = datetime.strptime(start_date, '%Y-%m-%d').date()
-        end_dt = datetime.strptime(end_date, '%Y-%m-%d').date()
+        sold_dates = {row["SaleDate"] for row in rows}
+        start_dt = datetime.strptime(start_date, "%Y-%m-%d").date()
+        end_dt = datetime.strptime(end_date, "%Y-%m-%d").date()
         gap_dates = []
         curr = start_dt
         while curr <= end_dt:
@@ -34,6 +35,7 @@ async def sales_gaps_impl(
         return create_tool_response(gap_dates, sql, params, metadata)
     except Exception as e:
         return create_tool_response([], sql, params, error=str(e))
+
 
 sales_gaps_tool = Tool(
     name="sales_gaps",

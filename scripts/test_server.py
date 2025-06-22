@@ -1,4 +1,3 @@
-
 """Launch the local FastAPI server for manual testing.
 
 This script is convenience glue so developers can run ``python scripts/test_server.py``
@@ -25,4 +24,3 @@ def main() -> None:
 
 if __name__ == "__main__":  # pragma: no cover - manual utility
     main()
-

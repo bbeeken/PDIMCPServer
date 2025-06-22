@@ -1,4 +1,5 @@
 """MCP PDI Server - Main server implementation"""
+
 from typing import List
 from mcp.server import Server
 from mcp.types import Tool
@@ -18,6 +19,7 @@ from .tools.site_lookup import site_lookup_tool
 from .tools.item_lookup import item_lookup_tool
 from .tools.get_today_date import get_today_date_tool
 
+
 def create_server() -> Server:
     """Create and configure the MCP server"""
     server = Server("mcp-pdi-sales")
@@ -29,17 +31,14 @@ def create_server() -> Server:
         sales_summary_tool,
         sales_trend_tool,
         top_items_tool,
-
         # Basket analysis
         basket_analysis_tool,
         item_correlation_tool,
         cross_sell_opportunities_tool,
-
         # Analytics
         hourly_sales_tool,
         sales_gaps_tool,
         year_over_year_tool,
-
         # Utility tools
         item_lookup_tool,
         site_lookup_tool,
@@ -51,11 +50,14 @@ def create_server() -> Server:
 
     return server
 
+
 async def run_server():
     """Run the MCP server"""
     server = create_server()
     await server.run()
 
+
 if __name__ == "__main__":
     import asyncio
+
     asyncio.run(run_server())

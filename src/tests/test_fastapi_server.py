@@ -76,4 +76,4 @@ def test_fastapi_call_tool(monkeypatch):
     resp = client.post("/call", json={"name": "sales_summary_tool", "arguments": {}})
     assert resp.status_code == 200
     body = resp.json()
-    assert body[0]["text"].find("sales_summary_tool") != -1
+    assert body["result"] == "sales_summary_tool"

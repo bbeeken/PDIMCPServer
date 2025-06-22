@@ -1,10 +1,12 @@
 """
 Database session management
 """
+
 from contextlib import contextmanager
 from typing import Generator
 from sqlalchemy.orm import Session
 from .engine import SessionLocal
+
 
 @contextmanager
 def get_db() -> Generator[Session, None, None]:
@@ -16,6 +18,7 @@ def get_db() -> Generator[Session, None, None]:
         yield db
     finally:
         db.close()
+
 
 def get_session() -> Session:
     """Get a new database session"""

@@ -7,7 +7,7 @@ from typing import Any, Dict, List
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from mcp.types import Tool, TextContent
+from mcp.types import Tool
 
 from .tools.sales.query_realtime import query_sales_realtime_tool
 from .tools.sales.sales_summary import sales_summary_tool
@@ -46,9 +46,11 @@ TOOLS: List[Tool] = [
 
 tool_map = {t.name: t for t in TOOLS}
 
+
 class CallRequest(BaseModel):
     name: str
     arguments: Dict[str, Any] = {}
+
 
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
@@ -60,25 +62,33 @@ def create_app() -> FastAPI:
         return TOOLS
 
     @app.post("/call", response_model=None)
-    async def call_tool(req: CallRequest) -> List[TextContent]:
+    async def call_tool(req: CallRequest):
         if req.name not in tool_map:
             raise HTTPException(status_code=404, detail=f"Unknown tool: {req.name}")
         tool = tool_map[req.name]
         if not hasattr(tool, "_implementation"):
-            raise HTTPException(status_code=500, detail=f"Tool {req.name} has no implementation")
+            raise HTTPException(
+                status_code=500, detail=f"Tool {req.name} has no implementation"
+            )
         try:
             result = await tool._implementation(**req.arguments)
+
             if isinstance(result, dict):
                 import json
+
                 formatted = json.dumps(result, indent=2, default=str)
             else:
                 formatted = str(result)
             return [TextContent(type="text", text=formatted)]
+
+            return result
+
         except Exception as exc:  # pragma: no cover - safety net
             logger.exception("Error executing %s", req.name)
             raise HTTPException(status_code=500, detail=str(exc))
 
     return app
+
 
 def main() -> None:
     """Run the FastAPI server using uvicorn."""
@@ -90,6 +100,7 @@ def main() -> None:
         port=int(os.getenv("PORT", "8000")),
         reload=False,
     )
+
 
 if __name__ == "__main__":
     main()
