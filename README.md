@@ -42,3 +42,11 @@ The server exposes two endpoints:
 * `GET /tools` - list available tools
 * `POST /call` - execute a tool by name
 
+## Smoke testing
+
+To verify the MCP server can be created without starting the HTTP API run:
+
+```bash
+python scripts/smoke_test_server.py
+```
+
