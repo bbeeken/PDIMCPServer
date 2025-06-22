@@ -6,7 +6,7 @@ from datetime import date
 from sqlalchemy import func, and_, or_, desc, Float
 from sqlalchemy.orm import Session, aliased
 from sqlalchemy.sql import text
-from ..database.models import SalesFact
+from ..db.models import SalesFact
 from .base import BaseRepository
 
 class BasketRepository(BaseRepository[SalesFact]):
