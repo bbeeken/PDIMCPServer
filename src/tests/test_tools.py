@@ -43,6 +43,7 @@ def load_server(monkeypatch):
         ("src.tools.sales.top_items", "top_items_tool"),
         ("src.tools.basket.basket_analysis", "basket_analysis_tool"),
         ("src.tools.basket.item_correlation", "item_correlation_tool"),
+        # newly implemented cross sell helper
         ("src.tools.basket.cross_sell", "cross_sell_opportunities_tool"),
         ("src.tools.get_today_date", "get_today_date_tool"),
     ]
