@@ -5,6 +5,7 @@ MCP Server implementation for PDI Sales Analytics
 import os
 import logging
 from typing import Any, Dict, List
+import mcp
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
@@ -110,12 +111,23 @@ async def main():
             return [TextContent(type="text", text=error_msg)]
     
 
-    # Run the server
-    logger.info("Server ready, starting stdio transport")
-    await stdio_server(
-        server,
-        server_params={"server_name": SERVER_NAME, "server_version": SERVER_VERSION},
+    # Prepare initialization options for the MCP server
+    init_options = mcp.server.InitializationOptions(
+        server_name=SERVER_NAME,
+        server_version=SERVER_VERSION,
+        capabilities=mcp.types.ServerCapabilities(
+            tools=mcp.types.ToolsCapability()
+        ),
     )
+
+    # Run the server using the stdio transport
+    logger.info("Server ready, starting stdio transport")
+    async with stdio_server() as (read_stream, write_stream):
+        await server.run(
+            read_stream,
+            write_stream,
+            init_options,
+        )
 
 
 if __name__ == "__main__":
