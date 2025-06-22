@@ -1,4 +1,9 @@
 import os
+import re
+import json
+from io import StringIO
+
+import pandas as pd
 import streamlit as st
 import ollama
 
@@ -14,24 +19,60 @@ if "messages" not in st.session_state:
 
 st.title("MCP Chat (Ollama)")
 
+
+def render_message(content: str) -> None:
+    """Render a chat message with optional charts."""
+    pattern = re.compile(r"```(json|csv)\n(.*?)```", re.DOTALL | re.IGNORECASE)
+    pos = 0
+    for match in pattern.finditer(content):
+        st.markdown(content[pos : match.start()])
+        lang = match.group(1).lower()
+        data = match.group(2)
+        try:
+            if lang == "json":
+                df = pd.DataFrame(json.loads(data))
+            else:  # csv
+                df = pd.read_csv(StringIO(data))
+        except Exception:
+            st.markdown(match.group(0))
+        else:
+            st.dataframe(df)
+            num_cols = df.select_dtypes("number").columns
+            if len(num_cols) > 0:
+                st.line_chart(df[num_cols])
+        pos = match.end()
+    if pos < len(content):
+        st.markdown(content[pos:])
+
+
 for msg in st.session_state.messages:
-    st.chat_message(msg["role"]).write(msg["content"])
+    with st.chat_message(msg["role"]):
+        render_message(msg["content"])
 
 prompt = st.chat_input("Ask something...")
 if prompt:
     st.session_state.messages.append({"role": "user", "content": prompt})
-    st.chat_message("user").write(prompt)
+    with st.chat_message("user"):
+        st.markdown(prompt)
     with st.chat_message("assistant"):
         try:
-            response = ollama.chat(
+            response_stream = ollama.chat(
                 model=MODEL,
                 messages=st.session_state.messages,
                 host=OLLAMA_HOST,
+                stream=True,
             )
-            content = response["message"]["content"]
+            chunks = []
+            placeholder = st.empty()
+            for chunk in response_stream:
+                part = chunk["message"]["content"]
+                chunks.append(part)
+                placeholder.markdown("".join(chunks))
+            content = "".join(chunks)
         except Exception as exc:  # pragma: no cover - external service
             st.error(f"Error contacting Ollama: {exc}")
             content = ""
         if content:
             st.session_state.messages.append({"role": "assistant", "content": content})
-            st.write(content)
+            placeholder.empty()
+            render_message(content)
