@@ -18,6 +18,7 @@ git clone <your-repo-url>
 cd mcp-pdi-server
 ```
 
+
 ## Running the FastAPI Server
 
 Install the dependencies and launch the HTTP server with `uvicorn`:
@@ -30,3 +31,14 @@ uvicorn src.fastapi_server:create_app --host 0.0.0.0 --port 8000
 The server exposes two endpoints:
 * `GET /tools` - list available tools
 * `POST /call` - execute a tool by name
+
+## Running the FastAPI server
+
+Start the HTTP API using `uvicorn`:
+
+```bash
+uvicorn src.fastapi_server:app --reload
+```
+
+This exposes `/tools` for listing tools and `/call` to execute them.
+
