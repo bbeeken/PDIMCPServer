@@ -5,11 +5,10 @@ MCP Server implementation for PDI Sales Analytics
 import os
 import logging
 from typing import Any, Dict, List
-from datetime import datetime
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
-from mcp.types import Tool, TextContent, ImageContent, EmbeddedResource
+from mcp.types import Tool
 
 from .tools.sales.query_realtime import query_sales_realtime_tool
 from .tools.sales.sales_summary import sales_summary_tool
@@ -69,8 +68,8 @@ async def main():
         return tools
 
     @server.call_tool()
-    async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
-        """Execute a tool and return results"""
+    async def call_tool(name: str, arguments: Dict[str, Any]):
+        """Execute a tool and return results as JSON"""
         logger.info(f"Calling tool: {name} with args: {arguments}")
 
         # Find the tool implementation
@@ -79,13 +78,16 @@ async def main():
         if name not in tool_map:
             error_msg = f"Unknown tool: {name}"
             logger.error(error_msg)
+
             return [TextContent(type="text", text=error_msg)]
+
 
         try:
             # Get the tool's implementation function
             tool = tool_map[name]
             if hasattr(tool, "_implementation"):
                 result = await tool._implementation(**arguments)
+
 
                 # Format result as text
                 if isinstance(result, dict):
@@ -106,6 +108,19 @@ async def main():
             error_msg = f"Error executing {name}: {str(e)}"
             logger.error(error_msg, exc_info=True)
             return [TextContent(type="text", text=error_msg)]
+
+
+                return result
+            else:
+                error_msg = f"Tool {name} has no implementation"
+                logger.error(error_msg)
+                return {"error": error_msg}
+                
+        except Exception as e:
+            error_msg = f"Error executing {name}: {str(e)}"
+            logger.error(error_msg, exc_info=True)
+            return {"error": error_msg}
+    
 
     # Run the server
     logger.info("Server ready, starting stdio transport")

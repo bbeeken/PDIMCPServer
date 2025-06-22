@@ -12,12 +12,14 @@ dependencies = [
     "mcp>=1.9.4",
     "pymssql>=2.3.4",
     "pandas>=2.3.0",
-    "numpy>=2.3.1",
+    "numpy>=1.26.2",
     "python-dotenv>=1.1.0",
 
     "fastapi>=0.115.13",
     "uvicorn>=0.34.3",
     "httpx>=0.28.1",
+    "streamlit>=1.46.0",
+    "ollama>=0.5.1",
 ]
 
 [project.optional-dependencies]

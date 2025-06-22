@@ -7,7 +7,7 @@ from typing import Any, Dict, List
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from mcp.types import Tool, TextContent
+from mcp.types import Tool
 
 from .tools.sales.query_realtime import query_sales_realtime_tool
 from .tools.sales.sales_summary import sales_summary_tool
@@ -62,7 +62,7 @@ def create_app() -> FastAPI:
         return TOOLS
 
     @app.post("/call", response_model=None)
-    async def call_tool(req: CallRequest) -> List[TextContent]:
+    async def call_tool(req: CallRequest):
         if req.name not in tool_map:
             raise HTTPException(status_code=404, detail=f"Unknown tool: {req.name}")
         tool = tool_map[req.name]
@@ -72,6 +72,7 @@ def create_app() -> FastAPI:
             )
         try:
             result = await tool._implementation(**req.arguments)
+
             if isinstance(result, dict):
                 import json
 
@@ -79,6 +80,9 @@ def create_app() -> FastAPI:
             else:
                 formatted = str(result)
             return [TextContent(type="text", text=formatted)]
+
+            return result
+
         except Exception as exc:  # pragma: no cover - safety net
             logger.exception("Error executing %s", req.name)
             raise HTTPException(status_code=500, detail=str(exc))
