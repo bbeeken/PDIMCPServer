@@ -1,7 +1,7 @@
 """Item correlation analysis tool"""
 from typing import Dict, Any, Optional
 from mcp.types import Tool
-from ...db.connection import get_db
+from ...db.session import get_db
 from ..utils import format_date, format_response, execute_sql
 
 async def item_correlation_impl(
