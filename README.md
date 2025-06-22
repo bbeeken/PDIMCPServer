@@ -42,6 +42,21 @@ The server exposes two endpoints:
 * `GET /tools` - list available tools
 * `POST /call` - execute a tool by name
 
+## Streamlit frontend
+
+Run a lightweight UI to interact with the API:
+
+```bash
+streamlit run streamlit_app.py
+```
+
+Set `MCP_API_URL` if the API is not running on the default `http://localhost:8000`.
+
+The app also exposes a **Chat** page available from Streamlit's sidebar. It uses
+a local Ollama model to provide an experimental ChatGPT-style interface.
+Set `OLLAMA_MODEL` to choose the model name and `OLLAMA_HOST` if the Ollama server
+is not running on `http://localhost:11434`.
+
 ## Smoke testing
 
 To verify the MCP server can be created without starting the HTTP API run:
@@ -50,3 +65,19 @@ To verify the MCP server can be created without starting the HTTP API run:
 python scripts/smoke_test_server.py
 ```
 
+
+## Streamlit frontend
+
+A Streamlit interface is provided for quick visualization of analytics results.
+After installing the dependencies you can launch it with:
+
+```bash
+streamlit run path/to/your_app.py
+```
+
+The frontend now includes options for viewing charts and exporting data:
+
+- **Graphing** – Result tables can be displayed as bar or line graphs.
+  Use the graph toggle to switch between tabular and visual views.
+- **CSV Export** – Each table includes a **Download CSV** button
+  for saving the query results for further analysis.
