@@ -8,6 +8,9 @@ from sqlalchemy.sql import func
 
 Base = declarative_base()
 
+# Fully qualified database view names
+SALES_FACT_VIEW = "dbo.V_LLM_SalesFact"
+
 class SalesFact(Base):
     """V_LLM_SalesFact - Real-time sales transactions"""
     __tablename__ = 'V_LLM_SalesFact'
