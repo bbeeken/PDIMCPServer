@@ -71,7 +71,7 @@ def scroll_to_bottom() -> None:
 
 def render_message(content: str) -> None:
     """Render a chat message supporting code blocks and charts."""
-    pattern = re.compile(r"```(\w+)?\n(.*?)```", re.DOTALL)
+    pattern = re.compile(r"```(\w+)?[ \t]*\n?(.*?)```", re.DOTALL)
     pos = 0
     for match in pattern.finditer(content):
         st.markdown(content[pos : match.start()])
@@ -134,8 +134,10 @@ if prompt:
         if content:
             st.session_state.messages.append({"role": "assistant", "content": content})
             placeholder.empty()
+
             render_message(content)
 
             st.markdown('</div>', unsafe_allow_html=True)
             scroll_to_bottom()
+
 
