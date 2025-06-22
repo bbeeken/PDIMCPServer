@@ -55,6 +55,8 @@ def load_server(monkeypatch):
         ("src.tools.site_lookup", "site_lookup_tool"),
         ("src.tools.basket.cross_sell", "cross_sell_opportunities_tool"),
         ("src.tools.get_today_date", "get_today_date_tool"),
+        ("src.tools.item_lookup", "item_lookup_tool"),
+        ("src.tools.site_lookup", "site_lookup_tool"),
     ]
 
     for path, attr in imports:
@@ -74,5 +76,5 @@ def test_tool_registration(monkeypatch):
     mcp_server, DummyServer = load_server(monkeypatch)
     server = mcp_server.create_server()
     assert isinstance(server, DummyServer)
-    assert len(server.tools) == 8
+    assert len(server.tools) == 10
     assert all(hasattr(t, "name") for t in server.tools)

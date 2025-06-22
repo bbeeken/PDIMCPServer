@@ -23,6 +23,8 @@ from .tools.site_lookup import site_lookup_tool
 from .tools.item_lookup import item_lookup_tool
 from .tools.basket.cross_sell import cross_sell_opportunities_tool
 from .tools.get_today_date import get_today_date_tool
+from .tools.item_lookup import item_lookup_tool
+from .tools.site_lookup import site_lookup_tool
 
 def create_server() -> Server:
     """Create and configure the MCP server"""
@@ -47,7 +49,9 @@ def create_server() -> Server:
 
 
         # Utility tools
-        get_today_date_tool
+        get_today_date_tool,
+        item_lookup_tool,
+        site_lookup_tool,
     ]
 
     for tool in tools:
