@@ -2,6 +2,7 @@
 from typing import Dict, Any, Optional
 from mcp.types import Tool
 from ...db.connection import get_db
+from ...db.models import SALES_FACT_VIEW
 from ..utils import format_date, format_response, execute_sql
 
 async def item_correlation_impl(
@@ -13,10 +14,10 @@ async def item_correlation_impl(
     site_id: Optional[int] = None
 ) -> Dict[str, Any]:
     """Find items frequently bought with a specific item"""
-    query = """
+    query = f"""
     WITH TargetTransactions AS (
         SELECT DISTINCT TransactionID
-        FROM dbo.V_LLM_SalesFact
+        FROM {SALES_FACT_VIEW}
         WHERE ItemID = :item_id
             AND SaleDate BETWEEN :start_date AND :end_date
     """
@@ -34,7 +35,7 @@ async def item_correlation_impl(
     ),
     TargetInfo AS (
         SELECT TOP 1 ItemName, Category
-        FROM dbo.V_LLM_SalesFact
+        FROM {SALES_FACT_VIEW}
         WHERE ItemID = :item_id
     ),
     Correlations AS (
@@ -45,7 +46,7 @@ async def item_correlation_impl(
             AVG(s.GrossSales) AS avg_sales_together,
             SUM(s.QtySold) AS total_qty_together,
             SUM(s.GrossSales) AS total_sales_together
-        FROM dbo.V_LLM_SalesFact s
+        FROM {SALES_FACT_VIEW} s
         JOIN TargetTransactions t ON s.TransactionID = t.TransactionID
         WHERE s.ItemID != :item_id
     """
