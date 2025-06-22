@@ -39,6 +39,7 @@ def create_server() -> Server:
         # Basket analysis tools
         basket_analysis_tool,
         item_correlation_tool,
+        cross_sell_opportunities_tool,
 
         basket_metrics_tool,
         cross_sell_tool,
