@@ -3,6 +3,7 @@ from typing import Dict, Any, Optional
 from sqlalchemy import text
 from mcp.types import Tool
 from ...db.connection import get_db
+from ...db.models import SALES_FACT_VIEW
 from ..utils import format_date, format_response, execute_sql
 
 async def basket_analysis_impl(
@@ -15,10 +16,10 @@ async def basket_analysis_impl(
 ) -> Dict[str, Any]:
     """Find frequently bought together items with lift analysis"""
 
-    query = """
+    query = f"""
     WITH TxItems AS (
         SELECT DISTINCT TransactionID, ItemID, ItemName
-        FROM dbo.V_LLM_SalesFact
+        FROM {SALES_FACT_VIEW}
         WHERE SaleDate BETWEEN :start_date AND :end_date
     """
 
@@ -36,7 +37,7 @@ async def basket_analysis_impl(
     ),
     TxCount AS (
         SELECT COUNT(DISTINCT TransactionID) AS total_transactions
-        FROM dbo.V_LLM_SalesFact
+        FROM {SALES_FACT_VIEW}
         WHERE SaleDate BETWEEN :start_date AND :end_date
     """
 

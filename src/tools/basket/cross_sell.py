@@ -5,6 +5,7 @@ from typing import Any, Dict, Optional
 from mcp.types import Tool
 
 from ...db.connection import execute_query
+from ...db.models import SALES_FACT_VIEW
 from ..utils import validate_date_range, create_tool_response
 
 
@@ -19,17 +20,17 @@ async def cross_sell_opportunities_impl(
 
     start_date, end_date = validate_date_range(start_date, end_date)
 
-    sql = """
+    sql = f"""
     SELECT TOP (?)
         s.ItemID,
         s.ItemName,
         COUNT(*) AS pair_count,
         SUM(s.QtySold) AS total_qty,
         SUM(s.GrossSales) AS total_sales
-    FROM dbo.V_LLM_SalesFact s
+    FROM {SALES_FACT_VIEW} s
     JOIN (
         SELECT DISTINCT TransactionID
-        FROM dbo.V_LLM_SalesFact
+        FROM {SALES_FACT_VIEW}
         WHERE ItemID = ?
           AND SaleDate BETWEEN ? AND ?
     """
