@@ -90,3 +90,6 @@ cross_sell_opportunities_tool = Tool(
 
 cross_sell_opportunities_tool._implementation = cross_sell_opportunities_impl
 
+# Backwards compatible alias
+cross_sell_tool = cross_sell_opportunities_tool
+
