@@ -9,6 +9,10 @@ import ollama
 
 MODEL = os.getenv("OLLAMA_MODEL", "llama3")
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+TEMPERATURE = float(os.getenv("OLLAMA_TEMPERATURE", "0.8"))
+TOP_P = float(os.getenv("OLLAMA_TOP_P", "0.9"))
+TOP_K = int(os.getenv("OLLAMA_TOP_K", "40"))
+OPTIONS = {"temperature": TEMPERATURE, "top_p": TOP_P, "top_k": TOP_K}
 
 st.set_page_config(page_title="MCP Chat", page_icon="💬", layout="wide")
 
@@ -118,6 +122,7 @@ if prompt:
                 model=MODEL,
                 messages=st.session_state.messages,
                 host=OLLAMA_HOST,
+                options=OPTIONS,
                 stream=True,
             )
             chunks = []
