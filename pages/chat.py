@@ -14,10 +14,12 @@ TOP_P = float(os.getenv("OLLAMA_TOP_P", "0.9"))
 TOP_K = int(os.getenv("OLLAMA_TOP_K", "40"))
 OPTIONS = {"temperature": TEMPERATURE, "top_p": TOP_P, "top_k": TOP_K}
 
+
 # Lazily configure an Ollama client if the package provides the Client class.
 # Tests replace the ``ollama`` module with a minimal stub that lacks this
 # attribute, so guard against AttributeError during import.
 client = ollama.Client(host=OLLAMA_HOST) if hasattr(ollama, "Client") else None
+
 
 st.set_page_config(page_title="MCP Chat", page_icon="💬", layout="wide")
 
