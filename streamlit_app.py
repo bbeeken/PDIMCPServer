@@ -1,4 +1,6 @@
 import os
+import json
+import pandas as pd
 import httpx
 import streamlit as st
 
@@ -9,6 +11,42 @@ def load_tools():
     resp = httpx.get(f"{SERVER_URL}/tools")
     resp.raise_for_status()
     return resp.json()
+
+
+def render_content(content: dict, index: int) -> None:
+    """Render a tool output item."""
+    if content.get("type") == "text":
+        text = content.get("text", "")
+        df = None
+        try:
+            data = json.loads(text)
+            if isinstance(data, list) and all(isinstance(row, dict) for row in data):
+                df = pd.DataFrame(data)
+        except Exception:
+            pass
+
+        if df is not None:
+            chart = st.checkbox("Chart view", key=f"chart_{index}", value=False)
+            if chart:
+                numeric = df.select_dtypes("number")
+                if len(numeric.columns) > 0:
+                    st.line_chart(numeric)
+                else:
+                    st.bar_chart(df)
+            else:
+                st.dataframe(df)
+            csv = df.to_csv(index=False).encode("utf-8")
+            st.download_button(
+                "Download CSV",
+                csv,
+                file_name="results.csv",
+                mime="text/csv",
+                key=f"csv_{index}",
+            )
+        else:
+            st.text(text)
+    else:
+        st.json(content)
 
 def main() -> None:
     st.title("MCP PDI Sales Tools")
@@ -48,14 +86,14 @@ def main() -> None:
     if submitted:
         with st.spinner("Calling tool..."):
             try:
-                resp = httpx.post(f"{SERVER_URL}/call", json={"name": selected_name, "arguments": args})
+                resp = httpx.post(
+                    f"{SERVER_URL}/call",
+                    json={"name": selected_name, "arguments": args},
+                )
                 resp.raise_for_status()
                 outputs = resp.json()
-                for content in outputs:
-                    if content.get("type") == "text":
-                        st.text(content.get("text", ""))
-                    else:
-                        st.json(content)
+                for idx, content in enumerate(outputs):
+                    render_content(content, idx)
             except Exception as exc:  # pragma: no cover - external service
                 st.error(f"Error calling tool: {exc}")
 

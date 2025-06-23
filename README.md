@@ -59,7 +59,8 @@ model and `OLLAMA_HOST` if the Ollama server is not at `http://localhost:11434`.
 Chat generation can also be tuned with:
 `OLLAMA_TEMPERATURE` (0-1), `OLLAMA_TOP_P`, and `OLLAMA_TOP_K`.
 
-The frontend also includes options for viewing charts and exporting data:
+The frontend automatically converts JSON lists from tool outputs into tables.
+It also includes options for viewing charts and exporting data:
 
 - **Graphing** – Result tables can be displayed as bar or line graphs.
   Use the graph toggle to switch between tabular and visual views.
