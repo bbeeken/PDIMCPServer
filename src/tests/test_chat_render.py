@@ -49,6 +49,7 @@ def chat_module(monkeypatch):
     st.chat_message = chat_message
     st.chat_input = lambda *a, **kw: None
     st.empty = record("empty")
+    st.sidebar = types.SimpleNamespace(button=lambda *a, **kw: False)
 
     pd = types.ModuleType("pandas")
     class DF:
@@ -139,6 +140,7 @@ def test_chat_env_options(monkeypatch):
     st.chat_message = chat_message
     st.chat_input = lambda *a, **kw: "hi"
     st.empty = record("empty")
+    st.sidebar = types.SimpleNamespace(button=lambda *a, **kw: False)
 
     pd = types.ModuleType("pandas")
 
@@ -167,4 +169,15 @@ def test_chat_env_options(monkeypatch):
     importlib.reload(importlib.import_module("pages.chat"))
 
     assert any(c[0] == "ollama.chat" and c[1]["options"] == {"temperature": 0.5, "top_p": 0.75, "top_k": 32} for c in calls)
+
+
+def test_clear_chat_button_resets_state(chat_module, monkeypatch):
+    chat, _ = chat_module
+    st = sys.modules["streamlit"]
+    st.session_state.messages = [{"role": "user", "content": "hello"}]
+    monkeypatch.setattr(st.sidebar, "button", lambda *a, **kw: True)
+    importlib.reload(chat)
+    assert st.session_state.messages == [
+        {"role": "system", "content": "You are a helpful assistant."}
+    ]
 

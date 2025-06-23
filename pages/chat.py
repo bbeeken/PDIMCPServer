@@ -14,6 +14,8 @@ TOP_P = float(os.getenv("OLLAMA_TOP_P", "0.9"))
 TOP_K = int(os.getenv("OLLAMA_TOP_K", "40"))
 OPTIONS = {"temperature": TEMPERATURE, "top_p": TOP_P, "top_k": TOP_K}
 
+INITIAL_MESSAGE = {"role": "system", "content": "You are a helpful assistant."}
+
 
 # Lazily configure an Ollama client if the package provides the Client class.
 # Tests replace the ``ollama`` module with a minimal stub that lacks this
@@ -61,9 +63,10 @@ st.markdown(
 )
 
 if "messages" not in st.session_state:
-    st.session_state.messages = [
-        {"role": "system", "content": "You are a helpful assistant."}
-    ]
+    st.session_state.messages = [INITIAL_MESSAGE]
+
+if st.sidebar.button("Clear chat"):
+    st.session_state.messages = [INITIAL_MESSAGE]
 
 st.title("MCP Chat (Ollama)")
 
