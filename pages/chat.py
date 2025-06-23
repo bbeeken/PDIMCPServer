@@ -9,6 +9,10 @@ import ollama
 
 MODEL = os.getenv("OLLAMA_MODEL", "llama3")
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+TEMPERATURE = float(os.getenv("OLLAMA_TEMPERATURE", "0.8"))
+TOP_P = float(os.getenv("OLLAMA_TOP_P", "0.9"))
+TOP_K = int(os.getenv("OLLAMA_TOP_K", "40"))
+OPTIONS = {"temperature": TEMPERATURE, "top_p": TOP_P, "top_k": TOP_K}
 
 # Lazily configure an Ollama client if the package provides the Client class.
 # Tests replace the ``ollama`` module with a minimal stub that lacks this
@@ -119,6 +123,15 @@ if prompt:
     with st.chat_message("assistant"):
         st.markdown('<div class="assistant-msg">', unsafe_allow_html=True)
         try:
+
+            response_stream = ollama.chat(
+                model=MODEL,
+                messages=st.session_state.messages,
+                host=OLLAMA_HOST,
+                options=OPTIONS,
+                stream=True,
+            )
+
             if client is not None:
                 response_stream = client.chat(
                     model=MODEL,
@@ -132,6 +145,7 @@ if prompt:
                     host=OLLAMA_HOST,
                     stream=True,
                 )
+
             chunks = []
             placeholder = st.empty()
             for chunk in response_stream:
