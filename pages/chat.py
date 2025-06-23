@@ -100,7 +100,16 @@ def render_message(content: str) -> None:
                 st.dataframe(df)
                 num_cols = df.select_dtypes("number").columns
                 if len(num_cols) > 0:
-                    st.line_chart(df[num_cols])
+                    chart_type = st.radio(
+                        "Chart type",
+                        ("Line", "Bar"),
+                        index=0,
+                        key=f"chart_{match.start()}",
+                    )
+                    if chart_type == "Line":
+                        st.line_chart(df[num_cols])
+                    else:
+                        st.bar_chart(df[num_cols])
         else:
             st.code(data, language=lang or None)
         pos = match.end()

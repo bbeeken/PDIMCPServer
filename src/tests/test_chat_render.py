@@ -22,6 +22,12 @@ def chat_module(monkeypatch):
             return Placeholder() if name == "empty" else None
         return fn
 
+    def record_return(name, value):
+        def fn(*args, **kwargs):
+            calls.append((name, args, kwargs))
+            return value
+        return fn
+
     class Placeholder:
         def markdown(self, text, **kwargs):
             calls.append(("placeholder.markdown", text))
@@ -36,6 +42,8 @@ def chat_module(monkeypatch):
     st.code = record("code")
     st.dataframe = record("dataframe")
     st.line_chart = record("line_chart")
+    st.bar_chart = record("bar_chart")
+    st.radio = record_return("radio", "Line")
     st.error = record("error")
     def chat_message(role):
         class Ctx:
@@ -53,9 +61,12 @@ def chat_module(monkeypatch):
     pd = types.ModuleType("pandas")
     class DF:
         def __init__(self):
-            self.columns = []
+            self.columns = ["num"]
 
         def select_dtypes(self, *a, **k):
+            return self
+
+        def __getitem__(self, key):
             return self
     pd.DataFrame = lambda data: calls.append(("DataFrame", data)) or DF()
     pd.read_csv = lambda buf: calls.append(("read_csv", buf.getvalue())) or DF()
@@ -82,7 +93,7 @@ def test_render_message_code_variants(chat_module):
         assert any(c[0] == "code" for c in calls)
 
 
-def test_render_message_json_csv(chat_module):
+def test_render_message_json_csv(chat_module, monkeypatch):
     chat, calls = chat_module
     msgs = [
         "```json\n[{\"a\":1}]\n```",
@@ -92,6 +103,18 @@ def test_render_message_json_csv(chat_module):
         calls.clear()
         chat.render_message(msg)
         assert any(c[0] == "dataframe" for c in calls)
+        assert any(c[0] == "line_chart" for c in calls)
+        assert any(c[0] == "radio" for c in calls)
+
+    def radio_bar(*args, **kwargs):
+        calls.append(("radio", args, kwargs))
+        return "Bar"
+
+    monkeypatch.setattr(chat.st, "radio", radio_bar)
+    for msg in msgs:
+        calls.clear()
+        chat.render_message(msg)
+        assert any(c[0] == "bar_chart" for c in calls)
 
 
 def test_chat_env_options(monkeypatch):
@@ -126,6 +149,8 @@ def test_chat_env_options(monkeypatch):
     st.code = record("code")
     st.dataframe = record("dataframe")
     st.line_chart = record("line_chart")
+    st.bar_chart = record("bar_chart")
+    st.radio = lambda *a, **kw: (calls.append(("radio", a, kw)) or "Line")
     st.error = record("error")
     def chat_message(role):
         class Ctx:
@@ -144,9 +169,12 @@ def test_chat_env_options(monkeypatch):
 
     class DF:
         def __init__(self):
-            self.columns = []
+            self.columns = ["num"]
 
         def select_dtypes(self, *a, **k):
+            return self
+
+        def __getitem__(self, key):
             return self
 
     pd.DataFrame = lambda data: calls.append(("DataFrame", data)) or DF()
