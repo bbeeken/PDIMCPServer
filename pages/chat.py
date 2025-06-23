@@ -88,7 +88,9 @@ def render_message(content: str) -> None:
         st.markdown(content[pos : match.start()])
         lang = (match.group(1) or "").lower()
         data = match.group(2)
-        if lang in {"json", "csv"}:
+        if lang in {"math", "latex"}:
+            st.latex(data)
+        elif lang in {"json", "csv"}:
             try:
                 if lang == "json":
                     df = pd.DataFrame(json.loads(data))
@@ -159,7 +161,5 @@ if prompt:
 
             render_message(content)
 
-            st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
             scroll_to_bottom()
-
-

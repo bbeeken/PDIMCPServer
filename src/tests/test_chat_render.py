@@ -20,13 +20,16 @@ def chat_module(monkeypatch):
         def fn(*args, **kwargs):
             calls.append((name, args, kwargs))
             return Placeholder() if name == "empty" else None
+
         return fn
 
     class Placeholder:
         def markdown(self, text, **kwargs):
             calls.append(("placeholder.markdown", text))
+
         def empty(self):
             calls.append(("placeholder.empty",))
+
         def container(self):
             return self
 
@@ -34,16 +37,20 @@ def chat_module(monkeypatch):
     st.markdown = record("markdown")
     st.title = record("title")
     st.code = record("code")
+    st.latex = record("latex")
     st.dataframe = record("dataframe")
     st.line_chart = record("line_chart")
     st.error = record("error")
+
     def chat_message(role):
         class Ctx:
             def __enter__(self_inner):
                 calls.append(("chat_message", role))
                 return self_inner
+
             def __exit__(self_inner, exc_type, exc, tb):
                 pass
+
         return Ctx()
 
     st.chat_message = chat_message
@@ -51,12 +58,14 @@ def chat_module(monkeypatch):
     st.empty = record("empty")
 
     pd = types.ModuleType("pandas")
+
     class DF:
         def __init__(self):
             self.columns = []
 
         def select_dtypes(self, *a, **k):
             return self
+
     pd.DataFrame = lambda data: calls.append(("DataFrame", data)) or DF()
     pd.read_csv = lambda buf: calls.append(("read_csv", buf.getvalue())) or DF()
 
@@ -85,13 +94,25 @@ def test_render_message_code_variants(chat_module):
 def test_render_message_json_csv(chat_module):
     chat, calls = chat_module
     msgs = [
-        "```json\n[{\"a\":1}]\n```",
+        '```json\n[{"a":1}]\n```',
         "```csv\na,b\n1,2\n```",
     ]
     for msg in msgs:
         calls.clear()
         chat.render_message(msg)
         assert any(c[0] == "dataframe" for c in calls)
+
+
+def test_render_message_latex(chat_module):
+    chat, calls = chat_module
+    msgs = [
+        "pre\n```math\nx^2\n```\npost",
+        "pre\n```latex\n\\frac{a}{b}\n```\npost",
+    ]
+    for msg in msgs:
+        calls.clear()
+        chat.render_message(msg)
+        assert any(c[0] == "latex" for c in calls)
 
 
 def test_chat_env_options(monkeypatch):
@@ -108,6 +129,7 @@ def test_chat_env_options(monkeypatch):
         def fn(*args, **kwargs):
             calls.append((name, args, kwargs))
             return Placeholder() if name == "empty" else None
+
         return fn
 
     class Placeholder:
@@ -127,13 +149,16 @@ def test_chat_env_options(monkeypatch):
     st.dataframe = record("dataframe")
     st.line_chart = record("line_chart")
     st.error = record("error")
+
     def chat_message(role):
         class Ctx:
             def __enter__(self_inner):
                 calls.append(("chat_message", role))
                 return self_inner
+
             def __exit__(self_inner, exc_type, exc, tb):
                 pass
+
         return Ctx()
 
     st.chat_message = chat_message
@@ -166,5 +191,8 @@ def test_chat_env_options(monkeypatch):
 
     importlib.reload(importlib.import_module("pages.chat"))
 
-    assert any(c[0] == "ollama.chat" and c[1]["options"] == {"temperature": 0.5, "top_p": 0.75, "top_k": 32} for c in calls)
-
+    assert any(
+        c[0] == "ollama.chat"
+        and c[1]["options"] == {"temperature": 0.5, "top_p": 0.75, "top_k": 32}
+        for c in calls
+    )
