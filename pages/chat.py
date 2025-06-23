@@ -126,18 +126,11 @@ if prompt:
         st.markdown('<div class="assistant-msg">', unsafe_allow_html=True)
         try:
 
-            response_stream = ollama.chat(
-                model=MODEL,
-                messages=st.session_state.messages,
-                host=OLLAMA_HOST,
-                options=OPTIONS,
-                stream=True,
-            )
-
             if client is not None:
                 response_stream = client.chat(
                     model=MODEL,
                     messages=st.session_state.messages,
+                    options=OPTIONS,
                     stream=True,
                 )
             else:
@@ -145,6 +138,7 @@ if prompt:
                     model=MODEL,
                     messages=st.session_state.messages,
                     host=OLLAMA_HOST,
+                    options=OPTIONS,
                     stream=True,
                 )
 
