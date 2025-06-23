@@ -59,12 +59,11 @@ model and `OLLAMA_HOST` if the Ollama server is not at `http://localhost:11434`.
 Chat generation can also be tuned with:
 `OLLAMA_TEMPERATURE` (0-1), `OLLAMA_TOP_P`, and `OLLAMA_TOP_K`.
 
-The frontend also includes options for viewing charts and exporting data:
+On the main page, select a tool from the sidebar and fill in the generated form
+to call the API. Returned text or JSON/CSV output is displayed below the form.
 
-- **Graphing** – Result tables can be displayed as bar or line graphs.
-  Use the graph toggle to switch between tabular and visual views.
-- **CSV Export** – Each table includes a **Download CSV** button
-  for saving the query results for further analysis.
+The chat page can render tables and simple line charts when JSON or CSV is
+included inside fenced code blocks.
 
 
 ## Smoke testing
