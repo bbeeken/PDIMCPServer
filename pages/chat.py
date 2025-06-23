@@ -9,6 +9,7 @@ import ollama
 
 MODEL = os.getenv("OLLAMA_MODEL", "llama3")
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+client = ollama.Client(host=OLLAMA_HOST)
 
 st.set_page_config(page_title="MCP Chat", page_icon="💬", layout="wide")
 
@@ -114,10 +115,9 @@ if prompt:
     with st.chat_message("assistant"):
         st.markdown('<div class="assistant-msg">', unsafe_allow_html=True)
         try:
-            response_stream = ollama.chat(
+            response_stream = client.chat(
                 model=MODEL,
                 messages=st.session_state.messages,
-                host=OLLAMA_HOST,
                 stream=True,
             )
             chunks = []
