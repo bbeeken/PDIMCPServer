@@ -7,12 +7,11 @@ import pandas as pd
 import streamlit as st
 import ollama
 
-MODEL = os.getenv("OLLAMA_MODEL", "llama3")
+MODEL_DEFAULT = os.getenv("OLLAMA_MODEL", "llama3")
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
-TEMPERATURE = float(os.getenv("OLLAMA_TEMPERATURE", "0.8"))
-TOP_P = float(os.getenv("OLLAMA_TOP_P", "0.9"))
-TOP_K = int(os.getenv("OLLAMA_TOP_K", "40"))
-OPTIONS = {"temperature": TEMPERATURE, "top_p": TOP_P, "top_k": TOP_K}
+TEMPERATURE_DEFAULT = float(os.getenv("OLLAMA_TEMPERATURE", "0.8"))
+TOP_P_DEFAULT = float(os.getenv("OLLAMA_TOP_P", "0.9"))
+TOP_K_DEFAULT = int(os.getenv("OLLAMA_TOP_K", "40"))
 
 
 # Lazily configure an Ollama client if the package provides the Client class.
@@ -66,6 +65,12 @@ if "messages" not in st.session_state:
     ]
 
 st.title("MCP Chat (Ollama)")
+
+# Sidebar options
+model = st.sidebar.text_input("Model", value=MODEL_DEFAULT)
+temperature = st.sidebar.slider("Temperature", 0.0, 1.0, value=float(TEMPERATURE_DEFAULT))
+top_p = st.sidebar.slider("Top-p", 0.0, 1.0, value=float(TOP_P_DEFAULT))
+top_k = st.sidebar.number_input("Top-k", value=int(TOP_K_DEFAULT), step=1)
 
 
 def scroll_to_bottom() -> None:
@@ -126,19 +131,25 @@ if prompt:
         st.markdown('<div class="assistant-msg">', unsafe_allow_html=True)
         try:
 
+            chat_options = {
+                "temperature": float(temperature),
+                "top_p": float(top_p),
+                "top_k": int(top_k),
+            }
+
             if client is not None:
                 response_stream = client.chat(
-                    model=MODEL,
+                    model=model,
                     messages=st.session_state.messages,
-                    options=OPTIONS,
+                    options=chat_options,
                     stream=True,
                 )
             else:
                 response_stream = ollama.chat(
-                    model=MODEL,
+                    model=model,
                     messages=st.session_state.messages,
                     host=OLLAMA_HOST,
-                    options=OPTIONS,
+                    options=chat_options,
                     stream=True,
                 )
 

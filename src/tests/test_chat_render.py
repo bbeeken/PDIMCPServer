@@ -50,6 +50,12 @@ def chat_module(monkeypatch):
     st.chat_input = lambda *a, **kw: None
     st.empty = record("empty")
 
+    st.sidebar = types.SimpleNamespace(
+        text_input=lambda *a, value="": value,
+        slider=lambda *a, value=0, **kw: value,
+        number_input=lambda *a, value=0, **kw: value,
+    )
+
     pd = types.ModuleType("pandas")
     class DF:
         def __init__(self):
@@ -139,6 +145,12 @@ def test_chat_env_options(monkeypatch):
     st.chat_message = chat_message
     st.chat_input = lambda *a, **kw: "hi"
     st.empty = record("empty")
+
+    st.sidebar = types.SimpleNamespace(
+        text_input=lambda *a, value="": value,
+        slider=lambda *a, value=0, **kw: value,
+        number_input=lambda *a, value=0, **kw: value,
+    )
 
     pd = types.ModuleType("pandas")
 
