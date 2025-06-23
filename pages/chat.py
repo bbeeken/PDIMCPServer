@@ -67,6 +67,18 @@ if "messages" not in st.session_state:
 
 st.title("MCP Chat (Ollama)")
 
+sidebar = getattr(st, "sidebar", st)
+button = None
+if hasattr(sidebar, "button"):
+    button = sidebar.button
+elif hasattr(st, "button"):
+    button = st.button
+if button and button("Reset Chat"):
+    st.session_state.messages = [
+        {"role": "system", "content": "You are a helpful assistant."}
+    ]
+    st.success("Conversation reset")
+
 
 def scroll_to_bottom() -> None:
     """Scroll the page to the bottom using JavaScript."""
