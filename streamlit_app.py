@@ -2,11 +2,13 @@ import os
 import httpx
 import streamlit as st
 
+HTTP_TIMEOUT = float(os.getenv("HTTP_TIMEOUT", "10"))
+
 SERVER_URL = os.getenv("MCP_API_URL", "http://localhost:8000")
 
 @st.cache_data
 def load_tools():
-    resp = httpx.get(f"{SERVER_URL}/tools")
+    resp = httpx.get(f"{SERVER_URL}/tools", timeout=HTTP_TIMEOUT)
     resp.raise_for_status()
     return resp.json()
 
@@ -48,7 +50,11 @@ def main() -> None:
     if submitted:
         with st.spinner("Calling tool..."):
             try:
-                resp = httpx.post(f"{SERVER_URL}/call", json={"name": selected_name, "arguments": args})
+                resp = httpx.post(
+                    f"{SERVER_URL}/call",
+                    json={"name": selected_name, "arguments": args},
+                    timeout=HTTP_TIMEOUT,
+                )
                 resp.raise_for_status()
                 outputs = resp.json()
                 for content in outputs:
