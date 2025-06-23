@@ -56,6 +56,8 @@ streamlit run streamlit_app.py
 Set `MCP_API_URL` if the FastAPI server is not running on `http://localhost:8000`.
 The **Chat** page uses a local Ollama model; configure `OLLAMA_MODEL` to select the
 model and `OLLAMA_HOST` if the Ollama server is not at `http://localhost:11434`.
+Chat generation can also be tuned with:
+`OLLAMA_TEMPERATURE` (0-1), `OLLAMA_TOP_P`, and `OLLAMA_TOP_K`.
 
 The frontend also includes options for viewing charts and exporting data:
 
