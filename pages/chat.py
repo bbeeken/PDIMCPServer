@@ -9,7 +9,11 @@ import ollama
 
 MODEL = os.getenv("OLLAMA_MODEL", "llama3")
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
-client = ollama.Client(host=OLLAMA_HOST)
+
+# Lazily configure an Ollama client if the package provides the Client class.
+# Tests replace the ``ollama`` module with a minimal stub that lacks this
+# attribute, so guard against AttributeError during import.
+client = ollama.Client(host=OLLAMA_HOST) if hasattr(ollama, "Client") else None
 
 st.set_page_config(page_title="MCP Chat", page_icon="💬", layout="wide")
 
@@ -115,11 +119,19 @@ if prompt:
     with st.chat_message("assistant"):
         st.markdown('<div class="assistant-msg">', unsafe_allow_html=True)
         try:
-            response_stream = client.chat(
-                model=MODEL,
-                messages=st.session_state.messages,
-                stream=True,
-            )
+            if client is not None:
+                response_stream = client.chat(
+                    model=MODEL,
+                    messages=st.session_state.messages,
+                    stream=True,
+                )
+            else:
+                response_stream = ollama.chat(
+                    model=MODEL,
+                    messages=st.session_state.messages,
+                    host=OLLAMA_HOST,
+                    stream=True,
+                )
             chunks = []
             placeholder = st.empty()
             for chunk in response_stream:
