@@ -52,6 +52,12 @@ Launch the web interface with:
 streamlit run streamlit_app.py
 ```
 
+The **Tools** page now uses `httpx` to retrieve the available tool list
+from `/tools` and renders a form based on each tool's input schema.  When
+the form is submitted it posts the arguments to `/call` using `httpx` and
+displays the returned content.  The previous manual JSON text area is no
+longer required.
+
 
 Set `MCP_API_URL` if the FastAPI server is not running on `http://localhost:8000`.
 The **Chat** page uses a local Ollama model; configure `OLLAMA_MODEL` to select the
@@ -65,6 +71,17 @@ The frontend also includes options for viewing charts and exporting data:
   Use the graph toggle to switch between tabular and visual views.
 - **CSV Export** – Each table includes a **Download CSV** button
   for saving the query results for further analysis.
+
+
+## Environment variables
+
+Several optional variables customize the server and UI:
+
+- `MCP_API_URL` – base URL of the FastAPI service (default `http://localhost:8000`)
+- `MCP_SERVER_NAME` – server name reported by the API
+- `MCP_SERVER_VERSION` – server version string
+- `OLLAMA_MODEL`, `OLLAMA_HOST`, `OLLAMA_TEMPERATURE`, `OLLAMA_TOP_P`, `OLLAMA_TOP_K` – parameters for the Chat page
+
 
 
 ## Smoke testing
