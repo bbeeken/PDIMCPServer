@@ -18,6 +18,13 @@ git clone <your-repo-url>
 cd mcp-pdi-server
 ```
 
+2. Install the Python dependencies (including `sqlalchemy`, `mcp` and `fastapi-mcp`):
+
+```bash
+pip install sqlalchemy mcp fastapi-mcp
+pip install -r requirements.txt
+```
+
 ## Database Setup
 
 Create a `.env` file based on `.env.example` and adjust the connection
