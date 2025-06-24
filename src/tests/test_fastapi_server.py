@@ -1,6 +1,7 @@
 import importlib
 import sys
 import types
+from mcp.types import Tool
 
 from fastapi.testclient import TestClient
 from .test_connection import load_connection
@@ -9,25 +10,7 @@ from .test_connection import load_connection
 def load_app(monkeypatch):
     load_connection(monkeypatch)
 
-    # stub mcp.types Tool and TextContent
-    mcp_mod = types.ModuleType("mcp")
-    types_mod = types.ModuleType("mcp.types")
-
-    class Tool:
-        def __init__(self, name=""):
-            self.name = name
-
-    class TextContent:
-        def __init__(self, type="text", text=""):
-            self.type = type
-            self.text = text
-
-    types_mod.Tool = Tool
-    types_mod.TextContent = TextContent
-    mcp_mod.types = types_mod
-
-    monkeypatch.setitem(sys.modules, "mcp", mcp_mod)
-    monkeypatch.setitem(sys.modules, "mcp.types", types_mod)
+    # use real mcp; only stub tool modules
 
     imports = [
         ("src.tools.sales.query_realtime", "query_sales_realtime_tool"),
@@ -47,13 +30,13 @@ def load_app(monkeypatch):
 
     def make_impl(name):
         async def impl(**_kw):
-            return {"result": name}
+            return {"result": name.replace("_tool", "")}
 
         return impl
 
     for path, attr in imports:
         mod = types.ModuleType(path)
-        tool = Tool(name=attr)
+        tool = Tool(name=attr.replace("_tool", ""), description="", inputSchema={})
         tool._implementation = make_impl(attr)
         setattr(mod, attr, tool)
         monkeypatch.setitem(sys.modules, path, mod)
@@ -73,7 +56,7 @@ def test_fastapi_list_tools(monkeypatch):
 def test_fastapi_call_tool(monkeypatch):
     app = load_app(monkeypatch)
     client = TestClient(app)
-    resp = client.post("/call", json={"name": "sales_summary_tool", "arguments": {}})
+    resp = client.post("/sales_summary", json={})
     assert resp.status_code == 200
     body = resp.json()
-    assert body["result"] == "sales_summary_tool"
+    assert body["result"] == "sales_summary"
