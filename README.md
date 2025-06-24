@@ -40,9 +40,8 @@ uvicorn src.fastapi_server:create_app --host 0.0.0.0 --port 8000 --reload
 
 Set `MCP_API_URL` if the API is not running on the default `http://localhost:8000`.
 
-The server exposes two endpoints:
-* `GET /tools` - list available tools
-* `POST /call` - execute a tool by name
+Each tool is exposed as its own endpoint (e.g. `POST /sales_summary`). The server
+also mounts a streaming SSE interface at `/mcp` using **fastapi-mcp**.
 
 ## Streamlit frontend
 

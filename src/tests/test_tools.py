@@ -17,8 +17,20 @@ def load_server(monkeypatch):
             self.name = name
             self.tools = []
 
-        def add_tool(self, tool):
-            self.tools.append(tool)
+        def list_tools(self):
+            def decorator(fn):
+                self._list_tools = fn
+                return fn
+            return decorator
+
+        def call_tool(self):
+            def decorator(fn):
+                self._call_tool = fn
+                return fn
+            return decorator
+
+        async def run(self, *a, **k):
+            pass
 
     class Tool:
         def __init__(self, name="", description="", inputSchema=None):
@@ -26,8 +38,14 @@ def load_server(monkeypatch):
             self.description = description
             self.inputSchema = inputSchema or {}
 
+    class TextContent:
+        def __init__(self, type="text", text=""):
+            self.type = type
+            self.text = text
+
     server_mod.Server = DummyServer
     types_mod.Tool = Tool
+    types_mod.TextContent = TextContent
     mcp_mod.server = server_mod
     mcp_mod.types = types_mod
 
