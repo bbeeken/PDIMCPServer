@@ -18,7 +18,7 @@ SERVER_NAME = os.getenv("MCP_SERVER_NAME", "mcp-pdi-sales")
 SERVER_VERSION = os.getenv("MCP_SERVER_VERSION", "1.0.0")
 
 
-def create_app() -> FastAPI:
+    mcp = FastApiMCP(app, include_operations=[t.name for t in TOOLS])
     """Create and configure the FastAPI application."""
 
     app = FastAPI(title=SERVER_NAME, version=SERVER_VERSION)

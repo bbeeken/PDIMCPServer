@@ -7,51 +7,7 @@ from .test_connection import load_connection
 def load_server(monkeypatch):
     load_connection(monkeypatch)  # ensure db dependencies are stubbed
 
-    # Stub MCP server and Tool classes
-    mcp_mod = types.ModuleType("mcp")
-    server_mod = types.ModuleType("mcp.server")
-    types_mod = types.ModuleType("mcp.types")
-
-    class DummyServer:
-        def __init__(self, name):
-            self.name = name
-            self.tools = []
-
-        def list_tools(self):
-            def decorator(fn):
-                self._list_tools = fn
-                return fn
-            return decorator
-
-        def call_tool(self):
-            def decorator(fn):
-                self._call_tool = fn
-                return fn
-            return decorator
-
-        async def run(self, *a, **k):
-            pass
-
-    class Tool:
-        def __init__(self, name="", description="", inputSchema=None):
-            self.name = name
-            self.description = description
-            self.inputSchema = inputSchema or {}
-
-    class TextContent:
-        def __init__(self, type="text", text=""):
-            self.type = type
-            self.text = text
-
-    server_mod.Server = DummyServer
-    types_mod.Tool = Tool
-    types_mod.TextContent = TextContent
-    mcp_mod.server = server_mod
-    mcp_mod.types = types_mod
-
-    monkeypatch.setitem(sys.modules, "mcp", mcp_mod)
-    monkeypatch.setitem(sys.modules, "mcp.server", server_mod)
-    monkeypatch.setitem(sys.modules, "mcp.types", types_mod)
+    # use real mcp; only stub tool modules
 
     # Stub tool modules used by src.mcp_server
     imports = [
@@ -70,19 +26,21 @@ def load_server(monkeypatch):
         ("src.tools.get_today_date", "get_today_date_tool"),
     ]
 
+    from mcp.types import Tool
+
     for path, attr in imports:
         mod = types.ModuleType(path)
-        tool = Tool(name=attr)
+        tool = Tool(name=attr.replace("_tool", ""), description="", inputSchema={})
         setattr(mod, attr, tool)
         monkeypatch.setitem(sys.modules, path, mod)
 
     mcp_server = importlib.reload(importlib.import_module("src.mcp_server"))
-    return mcp_server, DummyServer
+    return mcp_server
 
 
 def test_tool_registration(monkeypatch):
-    mcp_server, DummyServer = load_server(monkeypatch)
+    mcp_server = load_server(monkeypatch)
     server = mcp_server.create_server()
-    assert isinstance(server, DummyServer)
+    assert hasattr(server, "run")
     assert len(server.tools) == 13
     assert all(hasattr(t, "name") for t in server.tools)
