@@ -9,17 +9,19 @@ from fastapi_mcp import FastApiMCP
 from mcp.types import Tool
 
 
-from .tool_list import TOOLS
+        async def endpoint(
+            data: Dict[str, Any] = Body(..., json_schema_extra=schema),
+            _tool=tool,
+        ) -> Any:
+            if not hasattr(_tool, "_implementation"):
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Tool {_tool.name} has no implementation",
+                )
 
+            return await _tool._implementation(**data)
 
-logger = logging.getLogger(__name__)
-
-SERVER_NAME = os.getenv("MCP_SERVER_NAME", "mcp-pdi-sales")
-SERVER_VERSION = os.getenv("MCP_SERVER_VERSION", "1.0.0")
-
-
-    mcp = FastApiMCP(app, include_operations=[t.name for t in TOOLS])
-    """Create and configure the FastAPI application."""
+        app.post(f"/{tool.name}", operation_id=tool.name)(endpoint)
 
     app = FastAPI(title=SERVER_NAME, version=SERVER_VERSION)
 
