@@ -8,7 +8,7 @@ from fastapi import Body, FastAPI, HTTPException
 from fastapi_mcp import FastApiMCP
 from mcp.types import Tool
 
-from .mcp_server import create_server
+from .tool_list import TOOLS
 
 logger = logging.getLogger(__name__)
 
@@ -18,15 +18,14 @@ SERVER_VERSION = os.getenv("MCP_SERVER_VERSION", "1.0.0")
 
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
-    server = create_server()
     app = FastAPI(title=SERVER_NAME, version=SERVER_VERSION)
 
     # Create one endpoint per tool so FastApiMCP can expose them as MCP tools
-    for tool in server.tools:
+    for tool in TOOLS:
         schema = tool.inputSchema if isinstance(tool.inputSchema, dict) else {}
 
         def make_endpoint(t: Tool):
-            async def endpoint(data: Dict[str, Any] = Body(..., openapi_schema=schema)):
+            async def endpoint(data: Dict[str, Any] = Body(..., json_schema_extra=schema)):
                 if not hasattr(t, "_implementation"):
                     raise HTTPException(
                         status_code=500, detail=f"Tool {t.name} has no implementation"
@@ -40,10 +39,12 @@ def create_app() -> FastAPI:
     # Simple listing endpoint for convenience
     @app.get("/tools")
     async def list_tools() -> List[Tool]:
-        return server.tools
+        return TOOLS
 
-    # Mount the MCP SSE interface
-    FastApiMCP(app).mount()
+    # Mount the MCP SSE interface and expose the underlying MCP server
+    mcp = FastApiMCP(app)
+    mcp.mount()
+    app.state.mcp = mcp
 
     return app
 
