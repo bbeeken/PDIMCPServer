@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-"""
-Main entry point for MCP-PDI Server
-"""
+"""Main entry point for MCP-PDI Server."""
+
 import asyncio
 import sys
 import logging
-from src.server import main
+from src.mcp_server import run_server as main
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

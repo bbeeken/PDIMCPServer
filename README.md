@@ -42,6 +42,12 @@ Set `MCP_API_URL` if the API is not running on the default `http://localhost:800
 
 Each tool is exposed as its own endpoint (e.g. `POST /sales_summary`). The server
 also mounts a streaming SSE interface at `/mcp` using **fastapi-mcp**.
+Launch it with:
+
+```bash
+python mcp_server.py
+```
+
 
 ## Streamlit frontend
 
