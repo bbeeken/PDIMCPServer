@@ -26,9 +26,14 @@ def get_session() -> Any:
 
 
 def execute_query(sql: str, params: Optional[List[Any]] = None) -> list:
-    """Execute a SQL statement and return rows as dicts."""
+    """Execute ``sql`` and return the result rows as dictionaries.
+
+    ``params`` should be a sequence of positional arguments. Lists are
+    converted to tuples before being passed to SQLAlchemy.
+    """
+    bound_params = tuple(params) if params else ()
     with get_session() as session:
-        result = session.execute(text(sql), params or [])
+        result = session.execute(text(sql), bound_params)
         columns = result.keys()
         rows = result.fetchall()
         return [dict(zip(columns, row)) for row in rows]
