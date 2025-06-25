@@ -24,7 +24,7 @@ Create a `.env` file based on `.env.example` and adjust the connection
 settings. The variables `DB_SERVER`, `DB_DATABASE`, `DB_USERNAME`, and
 `DB_PASSWORD` configure the SQL Server connection used by the application.
 `DATABASE_URL` combines these into a standard SQLAlchemy URL using the
-`pymssql` driver. Additional options like `POOL_SIZE` and `MAX_OVERFLOW`
+`pyodbc` driver ("ODBC Driver 18 for SQL Server" by default). Additional options like `POOL_SIZE` and `MAX_OVERFLOW`
 control connection pooling. See the example file for the full list of
 supported variables.
 
