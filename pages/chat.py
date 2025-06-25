@@ -159,7 +159,5 @@ if prompt:
 
             render_message(content)
 
-            st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
             scroll_to_bottom()
-
-
