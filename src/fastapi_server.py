@@ -34,10 +34,12 @@ def create_app() -> FastAPI:
     # Create one endpoint per tool so FastApiMCP can expose them as MCP tools
     for tool in server.tools:
         schema = tool.inputSchema if isinstance(tool.inputSchema, dict) else {}
+        openapi_schema = dict(schema)
+        openapi_schema.pop("additionalProperties", None)
 
-        def make_endpoint(t: Tool) -> Any:
+        def make_endpoint(t: Tool, schema: Dict[str, Any], openapi_schema: Dict[str, Any]) -> Any:
             async def endpoint(
-                data: Dict[str, Any] = Body(..., json_schema_extra=schema)
+                data: Dict[str, Any] = Body(..., json_schema_extra=openapi_schema)
             ) -> Any:
                 if not hasattr(t, "_implementation"):
                     raise HTTPException(
@@ -58,7 +60,7 @@ def create_app() -> FastAPI:
 
             return endpoint
 
-        app.post(f"/{tool.name}", operation_id=tool.name)(make_endpoint(tool))
+        app.post(f"/{tool.name}", operation_id=tool.name)(make_endpoint(tool, schema, openapi_schema))
 
     @app.get("/tools")
     async def list_tools() -> List[Tool]:

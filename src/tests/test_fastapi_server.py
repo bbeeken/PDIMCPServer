@@ -34,9 +34,12 @@ def load_app(monkeypatch):
 
         return impl
 
+    item_schema = importlib.import_module("src.tools.item_lookup").item_lookup_tool.inputSchema
+
     for path, attr in imports:
         mod = types.ModuleType(path)
-        tool = Tool(name=attr.replace("_tool", ""), description="", inputSchema={})
+        schema = item_schema if path == "src.tools.item_lookup" else {}
+        tool = Tool(name=attr.replace("_tool", ""), description="", inputSchema=schema)
         tool._implementation = make_impl(attr)
         setattr(mod, attr, tool)
         monkeypatch.setitem(sys.modules, path, mod)
@@ -67,3 +70,10 @@ def test_reject_unknown_parameters(monkeypatch):
     client = TestClient(app)
     resp = client.post("/item_lookup", json={"item_id": 1, "bad": 1})
     assert resp.status_code == 422
+
+
+def test_item_lookup_valid(monkeypatch):
+    app = load_app(monkeypatch)
+    client = TestClient(app)
+    resp = client.post("/item_lookup", json={"item_id": 1})
+    assert resp.status_code == 200
