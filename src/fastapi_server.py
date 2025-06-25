@@ -59,7 +59,6 @@ def create_app() -> FastAPI:
             async def endpoint(
                 data: Dict[str, Any] = Body(..., json_schema_extra=openapi_schema)
 
-
         props = schema.get("properties", {})
         example = {}
         for name, prop in props.items():
@@ -77,6 +76,7 @@ def create_app() -> FastAPI:
         def make_endpoint(t: Tool) -> Any:
             async def endpoint(
                 data: Dict[str, Any] = Body(..., openapi_schema=openapi_schema)
+
 
             ) -> Any:
                 if not hasattr(t, "_implementation"):
