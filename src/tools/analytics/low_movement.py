@@ -56,6 +56,7 @@ low_movement_tool = Tool(
             "site_id": {"type": "integer", "description": "Optional site filter"},
         },
         "required": ["start_date", "end_date"],
+        "additionalProperties": False,
     },
 )
 low_movement_tool._implementation = low_movement_impl

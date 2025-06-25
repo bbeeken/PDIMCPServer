@@ -129,6 +129,7 @@ sales_trend_tool = Tool(
             },
         },
         "required": ["start_date", "end_date"],
+        "additionalProperties": False,
     },
 )
 

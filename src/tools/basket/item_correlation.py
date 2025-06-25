@@ -153,6 +153,7 @@ item_correlation_tool = Tool(
             "site_id": {"type": "integer", "description": "Filter by site ID"},
         },
         "required": ["item_id", "start_date", "end_date"],
+        "additionalProperties": False,
     },
 )
 item_correlation_tool._implementation = item_correlation_impl

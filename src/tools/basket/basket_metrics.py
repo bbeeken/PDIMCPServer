@@ -50,6 +50,7 @@ basket_metrics_tool = Tool(
             "site_id": {"type": "integer", "description": "Optional site filter"},
         },
         "required": ["start_date", "end_date"],
+        "additionalProperties": False,
     },
 )
 basket_metrics_tool._implementation = basket_metrics_impl
