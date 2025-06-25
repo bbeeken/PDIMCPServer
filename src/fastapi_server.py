@@ -35,6 +35,7 @@ def create_app() -> FastAPI:
     for tool in server.tools:
         schema = tool.inputSchema if isinstance(tool.inputSchema, dict) else {}
 
+
         props = schema.get("properties", {})
         example = {}
         for name, prop in props.items():
