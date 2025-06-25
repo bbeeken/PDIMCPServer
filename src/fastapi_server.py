@@ -35,6 +35,30 @@ def create_app() -> FastAPI:
     for tool in server.tools:
         schema = tool.inputSchema if isinstance(tool.inputSchema, dict) else {}
 
+        def build_example(spec: Dict[str, Any]) -> Dict[str, Any]:
+            example = {}
+            for name, prop in spec.get("properties", {}).items():
+                if "default" in prop:
+                    example[name] = prop["default"]
+                else:
+                    t = prop.get("type")
+                    if t == "integer":
+                        example[name] = 0
+                    elif t == "array":
+                        example[name] = []
+                    elif t == "boolean":
+                        example[name] = False
+                    else:
+                        example[name] = ""
+            return example
+
+        openapi_schema = dict(schema)
+        openapi_schema["example"] = build_example(schema)
+
+        def make_endpoint(t: Tool) -> Any:
+            async def endpoint(
+                data: Dict[str, Any] = Body(..., json_schema_extra=openapi_schema)
+
 
         props = schema.get("properties", {})
         example = {}
@@ -53,6 +77,7 @@ def create_app() -> FastAPI:
         def make_endpoint(t: Tool) -> Any:
             async def endpoint(
                 data: Dict[str, Any] = Body(..., openapi_schema=openapi_schema)
+
             ) -> Any:
                 if not hasattr(t, "_implementation"):
                     raise HTTPException(
