@@ -26,3 +26,9 @@ def test_execute_query(monkeypatch):
     db = load_connection(monkeypatch)
     result = db.execute_query("SELECT 1 AS value")
     assert result == [{"value": 1}]
+
+
+def test_execute_query_with_params(monkeypatch):
+    db = load_connection(monkeypatch)
+    result = db.execute_query("SELECT ? AS a, ? AS b", [1, 2])
+    assert result == [{"a": 1, "b": 2}]
