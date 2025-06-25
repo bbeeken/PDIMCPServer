@@ -66,7 +66,7 @@ async def sales_summary_impl(
         SELECT
             {select_sql}
             COUNT(DISTINCT TransactionID)                      AS TransactionCount,
-            COUNT(DISTINCT ItemID_Clean)                       AS UniqueItems,
+            COUNT(DISTINCT ItemID)                       AS UniqueItems,
             SUM(QtySold)                                       AS TotalQuantity,
             SUM(GrossSales)                                    AS TotalSales,
             CASE WHEN COUNT(DISTINCT TransactionID)=0

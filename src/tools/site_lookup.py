@@ -1,62 +1,109 @@
-"""Lookup site information"""
+# src/tools/site_lookup.py
+# Fully-cleaned – aligned to dbo.V_LLM_Sites and **no** duplicate blocks
 
+from __future__ import annotations
 from typing import Optional, Dict, Any
+
 from mcp.types import Tool
 from ..db.connection import execute_query
 from .utils import create_tool_response
 
-
+# ────────────────────────────────────────────────────────────────
+# Implementation
+# ────────────────────────────────────────────────────────────────
 async def site_lookup_impl(
-    site_id: Optional[int] = None,
+    site_id: Optional[int | str] = None,
     description: Optional[str] = None,
     limit: int = 50,
 ) -> Dict[str, Any]:
-    """Search ``dbo.Organization`` by site ID or description."""
+    """
+    Look up rows in **dbo.V_LLM_Sites**.
+
+    • `site_id`  > 0 → exact Site_id match  
+    • `site_id`  0 / None / "" → no Site_id filter (all sites)  
+    • `description` finds partial matches in Site_desc, GPS_City, or GPS_State.
+    """
+
+    # ── Base query ------------------------------------------------------
     sql = """
     SELECT TOP (:limit)
-        Site_id,
-        Location_ID AS location_id,
-        Location_Desc AS description,
-        GPS_City,
-        GPS_State,
-        GPS_Latitude,
-        GPS_Longitude
-    FROM dbo.Organization
-    WHERE 1=1
+           Site_id        AS SiteID,
+           Site_desc      AS SiteName,
+           GPS_Address1   AS Address,
+           GPS_City       AS City,
+           GPS_State      AS State,
+           GPS_Zip        AS PostalCode,
+           TimeZone_ID    AS TimeZone,
+           GPS_Longitude  AS Longitude,
+           GPS_Latitude   AS Latitude
+    FROM   dbo.V_LLM_Sites
+    WHERE  1 = 1
     """
-    params = {"limit": limit}
-    if site_id is not None:
-        sql += " AND Site_id = :site_id"
-        params["site_id"] = site_id
-    if description:
-        sql += " AND Location_Desc LIKE :description"
-        params["description"] = f"%{description}%"
-    sql += " ORDER BY Location_Desc"
+    params: Dict[str, Any] = {"limit": limit}
+
+    # Site-ID filter
     try:
-        results = execute_query(sql, params)
-        metadata = {
-            "filters": {"site_id": site_id, "description": description, "limit": limit}
+        sid = int(site_id) if site_id not in (None, "", "0") else 0
+    except (TypeError, ValueError):
+        sid = 0
+    if sid > 0:
+        sql += " AND Site_id = :site_id"
+        params["site_id"] = sid
+
+    # Description filter
+    if description:
+        sql += """
+        AND (
+                 Site_desc LIKE :desc
+              OR GPS_City  LIKE :desc
+              OR GPS_State LIKE :desc
+            )
+        """
+        params["desc"] = f"%{description}%"
+
+    sql += " ORDER BY Site_desc"
+
+    # ── Execute ---------------------------------------------------------
+    try:
+        rows = execute_query(sql, params)
+        meta = {
+            "filters": {
+                "site_id": sid if sid > 0 else None,
+                "description": description,
+                "limit": limit,
+            }
         }
-        return create_tool_response(results, sql, params, metadata)
-    except Exception as e:  # pragma: no cover - db errors depend on env
-        return create_tool_response([], sql, params, error=str(e))
+        return create_tool_response(rows, sql, params, meta)
+
+    except Exception as exc:  # pragma: no cover – db-env specific
+        return create_tool_response([], sql, params, error=str(exc))
 
 
+# ────────────────────────────────────────────────────────────────
+# Tool registration
+# ────────────────────────────────────────────────────────────────
 site_lookup_tool = Tool(
     name="site_lookup",
-    description="Look up sites in dbo.Organization by ID or description",
+    description="Look up site information from dbo.V_LLM_Sites",
     inputSchema={
         "type": "object",
         "properties": {
-            "site_id": {"type": "integer", "description": "Exact site ID"},
+            "site_id": {
+                "type": "integer",
+                "minimum": 0,
+                "default": 0,
+                "description": "Exact Site_id; 0 = all sites",
+            },
             "description": {
                 "type": "string",
-                "description": "Partial site description",
+                "description": "Partial match on Site_desc / City / State",
             },
             "limit": {
                 "type": "integer",
-                "description": "Max rows to return",
+                "minimum": 1,
+                "maximum": 500,
                 "default": 50,
+                "description": "Maximum rows to return",
             },
         },
         "required": [],

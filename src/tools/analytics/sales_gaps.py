@@ -1,51 +1,88 @@
-"""Identify dates within a range that have no recorded sales."""
+#!/usr/bin/env python3
+# sales_gaps.py – 2025-06-25  (patched)
 
-from datetime import datetime, timedelta
-from typing import Optional, Dict, Any, List
+from __future__ import annotations
+from datetime import date, timedelta, datetime
+from typing import Dict, Any, List, Optional
+
 from mcp.types import Tool
 from ...db.connection import execute_query
 from ...db.models import SALES_FACT_VIEW
 from ..utils import validate_date_range, create_tool_response
 
-
+# ───────────────────────────────────────────────────────────────
+# Implementation
+# ───────────────────────────────────────────────────────────────
 async def sales_gaps_impl(
     start_date: str,
-    end_date: str,
-    site_id: Optional[int] = None,
+    end_date:   str,
+    site_id:    Optional[int] = 0,   # 0 ⇒ all sites
 ) -> Dict[str, Any]:
-    """Return a list of dates where no sales exist."""
+    """
+    Return a list of calendar dates in the range [start_date, end_date]
+    for which **no** sales rows exist in V_LLM_SalesFact.
+    """
+
     start_date, end_date = validate_date_range(start_date, end_date)
-    sql = f"SELECT DISTINCT SaleDate FROM {SALES_FACT_VIEW} WHERE SaleDate BETWEEN :start_date AND :end_date"
-    params: Dict[str, Any] = {"start_date": start_date, "end_date": end_date}
-    if site_id is not None:
-        sql += " AND SiteID = :site_id"
+
+    # Half-open range protects against time components
+    site_pred = "AND SiteID = :site_id" if site_id and site_id > 0 else ""
+    sql = f"""
+        SELECT DISTINCT CONVERT(date, SaleDate) AS SaleDay
+        FROM {SALES_FACT_VIEW}
+        WHERE SaleDate >= :start_date
+          AND SaleDate <  DATEADD(day, 1, :end_date)
+          {site_pred}
+    """
+
+    params: Dict[str, Any] = {
+        "start_date": start_date,
+        "end_date":   end_date,
+    }
+    if site_id and site_id > 0:
         params["site_id"] = site_id
+
     try:
         rows = execute_query(sql, params)
-        sold_dates = {row["SaleDate"] for row in rows}
+        sold_days = {row["SaleDay"] for row in rows}
+
+        # Generate full date range and find gaps
         start_dt = datetime.strptime(start_date, "%Y-%m-%d").date()
-        end_dt = datetime.strptime(end_date, "%Y-%m-%d").date()
-        gap_dates = []
-        curr = start_dt
-        while curr <= end_dt:
-            if curr not in sold_dates:
-                gap_dates.append(curr.isoformat())
-            curr += timedelta(days=1)
-        metadata = {"date_range": f"{start_date} to {end_date}", "site_id": site_id}
-        return create_tool_response(gap_dates, sql, params, metadata)
-    except Exception as e:
-        return create_tool_response([], sql, params, error=str(e))
+        end_dt   = datetime.strptime(end_date,   "%Y-%m-%d").date()
 
+        gap_days: List[str] = []
+        cur = start_dt
+        while cur <= end_dt:
+            if cur not in sold_days:
+                gap_days.append(cur.isoformat())
+            cur += timedelta(days=1)
 
+        meta = {
+            "date_range": f"{start_date} → {end_date}",
+            "site_id": site_id,
+        }
+        return create_tool_response(gap_days, sql, params, meta)
+
+    except Exception as exc:  # noqa: BLE001
+        return create_tool_response([], sql, params, error=str(exc))
+
+# ───────────────────────────────────────────────────────────────
+# Tool registration
+# ───────────────────────────────────────────────────────────────
 sales_gaps_tool = Tool(
     name="sales_gaps",
-    description="List dates in a range with no sales data",
+    description="List calendar dates in a range that have no sales rows",
     inputSchema={
         "type": "object",
         "properties": {
-            "start_date": {"type": "string", "description": "Start date (YYYY-MM-DD)"},
-            "end_date": {"type": "string", "description": "End date (YYYY-MM-DD)"},
-            "site_id": {"type": "integer", "description": "Optional site filter"},
+            "start_date": {"type": "string", "format": "date"},
+            "end_date":   {"type": "string", "format": "date"},
+            "site_id":    {
+                "type": "integer",
+                "minimum": 0,
+                "default": 0,
+                "description": "0 = all sites; positive to filter one site",
+            },
         },
         "required": ["start_date", "end_date"],
         "additionalProperties": False,

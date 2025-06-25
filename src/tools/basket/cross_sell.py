@@ -1,104 +1,115 @@
-"""Cross sell opportunities tool"""
+#!/usr/bin/env python3
+# cross_sell_opportunities.py – 2025-06-25
+# Ready for production: paste into your tools package and hot-reload.
+
+from __future__ import annotations
 
 from typing import Any, Dict, Optional
-
 from mcp.types import Tool
 
 from ...db.connection import execute_query
 from ..utils import validate_date_range, create_tool_response
 
-
+# ────────────────────────────────────────────────────────────────
+# Implementation
+# ────────────────────────────────────────────────────────────────
 async def cross_sell_opportunities_impl(
     item_id: int,
     start_date: str,
     end_date: str,
-    site_id: Optional[int] = None,
+    site_id: Optional[int] = 0,      # 0 → all sites
     top_n: int = 10,
 ) -> Dict[str, Any]:
-    """Suggest complementary items frequently purchased with the target item."""
+    """
+    Return the top-N items most frequently purchased in the same
+    transactions as the target `item_id`.
+
+    * `site_id = 0` or `None` → ignore site filter (all locations).
+    * `site_id > 0`           → limit to that site only.
+    """
 
     start_date, end_date = validate_date_range(start_date, end_date)
 
-    sql = """
+    # Build SQL — add site predicate only when a positive site_id is supplied
+    site_pred = "AND SiteID = :site_id" if site_id and site_id > 0 else ""
+
+    sql = f"""
     SELECT TOP (:top_n)
-        s.ItemID,
-        s.ItemName,
-        COUNT(*) AS pair_count,
-        SUM(s.QtySold) AS total_qty,
-        SUM(s.GrossSales) AS total_sales
-    FROM dbo.V_LLM_SalesFact s
-    JOIN (
-        SELECT DISTINCT TransactionID
-        FROM dbo.V_LLM_SalesFact
-        WHERE ItemID = :item_id
-          AND SaleDate BETWEEN :start_date AND :end_date
+           s.ItemID,
+           s.ItemName,
+           COUNT(*)               AS pair_count,
+           SUM(s.QtySold)         AS total_qty,
+           SUM(s.GrossSales)      AS total_sales
+    FROM   dbo.V_LLM_SalesFact s
+    JOIN  (  SELECT DISTINCT TransactionID
+             FROM   dbo.V_LLM_SalesFact
+             WHERE  ItemID  = :item_id
+               AND  SaleDate BETWEEN :start_date AND :end_date
+               {site_pred}
+           ) t
+          ON s.TransactionID = t.TransactionID
+    WHERE  s.ItemID <> :item_id
+           {site_pred}
+    GROUP  BY s.ItemID, s.ItemName
+    ORDER  BY pair_count DESC;
     """
 
-    params = {
-        "top_n": top_n,
-        "item_id": item_id,
+    params: Dict[str, Any] = {
+        "top_n":      top_n,
+        "item_id":    item_id,
         "start_date": start_date,
-        "end_date": end_date,
+        "end_date":   end_date,
     }
-
-    if site_id is not None:
-        sql += " AND SiteID = :site_id"
+    if site_id and site_id > 0:
         params["site_id"] = site_id
 
-    sql += ") t ON s.TransactionID = t.TransactionID\n"
-    sql += "WHERE s.ItemID != :item_id"
-
-    if site_id is not None:
-        sql += " AND s.SiteID = :site_id"
-
-    sql += "\nGROUP BY s.ItemID, s.ItemName\nORDER BY pair_count DESC"
-
     try:
-        results = execute_query(sql, params)
+        rows = execute_query(sql, params)
 
-        for row in results:
-            if "total_qty" in row and row["total_qty"] is not None:
-                row["total_qty"] = float(row["total_qty"])
-            if "total_sales" in row and row["total_sales"] is not None:
-                row["total_sales"] = float(row["total_sales"])
+        # Cast numerics for JSON serialisation
+        for r in rows:
+            r["total_qty"]   = float(r["total_qty"])
+            r["total_sales"] = float(r["total_sales"])
 
-        metadata = {
+        meta = {
             "target_item_id": item_id,
-            "date_range": f"{start_date} to {end_date}",
+            "date_range": f"{start_date} → {end_date}",
             "site_id": site_id,
             "top_n": top_n,
         }
+        return create_tool_response(rows, sql, params, meta)
 
-        return create_tool_response(results, sql, params, metadata)
+    except Exception as exc:   # noqa: BLE001
+        return create_tool_response([], sql, params, error=str(exc))
 
-    except (
-        Exception
-    ) as e:  # pragma: no cover - database errors are environment specific
-        return create_tool_response([], sql, params, error=str(e))
-
-
+# ────────────────────────────────────────────────────────────────
+# Tool registration
+# ────────────────────────────────────────────────────────────────
 cross_sell_opportunities_tool = Tool(
     name="cross_sell_opportunities",
-    description="Recommend items often purchased with a specified item",
+    description="Recommend items frequently purchased with a specified item",
     inputSchema={
         "type": "object",
         "properties": {
-            "item_id": {"type": "integer", "description": "Target item ID"},
-            "start_date": {"type": "string", "description": "Start date (YYYY-MM-DD)"},
-            "end_date": {"type": "string", "description": "End date (YYYY-MM-DD)"},
-            "site_id": {"type": "integer", "description": "Optional site filter"},
+            "item_id":    {"type": "integer", "description": "Target item ID"},
+            "start_date": {"type": "string",  "format": "date"},
+            "end_date":   {"type": "string",  "format": "date"},
+            "site_id":    {
+                "type": "integer",
+                "minimum": 0,
+                "default": 0,
+                "description": "0 = all sites; positive value limits to one site",
+            },
             "top_n": {
                 "type": "integer",
-                "description": "Maximum items to return",
+                "minimum": 1,
+                "maximum": 100,
                 "default": 10,
+                "description": "Maximum number of cross-sell items to return",
             },
         },
         "required": ["item_id", "start_date", "end_date"],
         "additionalProperties": False,
     },
 )
-
 cross_sell_opportunities_tool._implementation = cross_sell_opportunities_impl
-
-
-cross_sell_tool = cross_sell_opportunities_tool
