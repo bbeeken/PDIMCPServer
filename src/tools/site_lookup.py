@@ -13,7 +13,7 @@ async def site_lookup_impl(
 ) -> Dict[str, Any]:
     """Search ``dbo.Organization`` by site ID or description."""
     sql = """
-    SELECT TOP (?)
+    SELECT TOP (:limit)
         Site_id,
         Location_ID AS location_id,
         Location_Desc AS description,
@@ -24,13 +24,13 @@ async def site_lookup_impl(
     FROM dbo.Organization
     WHERE 1=1
     """
-    params = [limit]
+    params = {"limit": limit}
     if site_id is not None:
-        sql += " AND Site_id = ?"
-        params.append(site_id)
+        sql += " AND Site_id = :site_id"
+        params["site_id"] = site_id
     if description:
-        sql += " AND Location_Desc LIKE ?"
-        params.append(f"%{description}%")
+        sql += " AND Location_Desc LIKE :description"
+        params["description"] = f"%{description}%"
     sql += " ORDER BY Location_Desc"
     try:
         results = execute_query(sql, params)

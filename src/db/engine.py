@@ -19,7 +19,12 @@ if not DATABASE_URL:
     username = os.getenv("DB_USERNAME")
     password = os.getenv("DB_PASSWORD")
 
-    DATABASE_URL = f"mssql+pymssql://{username}:{password}@{server}/{database}"
+    # Use the pyodbc driver with an explicit ODBC driver name
+    driver = os.getenv("ODBC_DRIVER", "ODBC Driver 18 for SQL Server")
+    driver_param = driver.replace(" ", "+")
+    DATABASE_URL = (
+        f"mssql+pyodbc://{username}:{password}@{server}/{database}?driver={driver_param}"
+    )
 
 # Create engine with connection pooling
 engine = create_engine(

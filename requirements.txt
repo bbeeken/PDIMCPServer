@@ -1,5 +1,5 @@
 sqlalchemy==2.0.41
-pymssql>=2.3.4
+pyodbc>=5.0.1
 alembic==1.16.2
 
 # Data processing

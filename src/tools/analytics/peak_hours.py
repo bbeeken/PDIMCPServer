@@ -23,12 +23,12 @@ async def peak_hours_impl(
            SUM(QtySold) AS total_quantity,
            COUNT(DISTINCT TransactionID) AS transaction_count
     FROM {SALES_FACT_VIEW}
-    WHERE SaleDate BETWEEN ? AND ?
+    WHERE SaleDate BETWEEN :start_date AND :end_date
     """
-    params: List[Any] = [start_date, end_date]
+    params: Dict[str, Any] = {"start_date": start_date, "end_date": end_date}
     if site_id is not None:
-        sql += " AND SiteID = ?"
-        params.append(site_id)
+        sql += " AND SiteID = :site_id"
+        params["site_id"] = site_id
     sql += " GROUP BY DATEPART(HOUR, TimeOfDay)"
     try:
         results = execute_query(sql, params)

@@ -20,14 +20,14 @@ async def low_movement_impl(
     sql = f"""
     SELECT ItemID, ItemName, SUM(QtySold) AS total_quantity, SUM(GrossSales) AS total_sales
     FROM {SALES_FACT_VIEW}
-    WHERE SaleDate BETWEEN ? AND ?
+    WHERE SaleDate BETWEEN :start_date AND :end_date
     """
-    params: List[Any] = [start_date, end_date]
+    params: Dict[str, Any] = {"start_date": start_date, "end_date": end_date}
     if site_id is not None:
-        sql += " AND SiteID = ?"
-        params.append(site_id)
-    sql += " GROUP BY ItemID, ItemName HAVING SUM(QtySold) <= ? ORDER BY total_quantity"
-    params.append(threshold)
+        sql += " AND SiteID = :site_id"
+        params["site_id"] = site_id
+    sql += " GROUP BY ItemID, ItemName HAVING SUM(QtySold) <= :threshold ORDER BY total_quantity"
+    params["threshold"] = threshold
     try:
         results = execute_query(sql, params)
         metadata = {

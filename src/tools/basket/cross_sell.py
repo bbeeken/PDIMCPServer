@@ -20,7 +20,7 @@ async def cross_sell_opportunities_impl(
     start_date, end_date = validate_date_range(start_date, end_date)
 
     sql = """
-    SELECT TOP (?)
+    SELECT TOP (:top_n)
         s.ItemID,
         s.ItemName,
         COUNT(*) AS pair_count,
@@ -30,23 +30,26 @@ async def cross_sell_opportunities_impl(
     JOIN (
         SELECT DISTINCT TransactionID
         FROM dbo.V_LLM_SalesFact
-        WHERE ItemID = ?
-          AND SaleDate BETWEEN ? AND ?
+        WHERE ItemID = :item_id
+          AND SaleDate BETWEEN :start_date AND :end_date
     """
 
-    params = [top_n, item_id, start_date, end_date]
+    params = {
+        "top_n": top_n,
+        "item_id": item_id,
+        "start_date": start_date,
+        "end_date": end_date,
+    }
 
     if site_id is not None:
-        sql += " AND SiteID = ?"
-        params.append(site_id)
+        sql += " AND SiteID = :site_id"
+        params["site_id"] = site_id
 
     sql += ") t ON s.TransactionID = t.TransactionID\n"
-    sql += "WHERE s.ItemID != ?"
-    params.append(item_id)
+    sql += "WHERE s.ItemID != :item_id"
 
     if site_id is not None:
-        sql += " AND s.SiteID = ?"
-        params.append(site_id)
+        sql += " AND s.SiteID = :site_id"
 
     sql += "\nGROUP BY s.ItemID, s.ItemName\nORDER BY pair_count DESC"
 

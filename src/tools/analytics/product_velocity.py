@@ -18,16 +18,16 @@ async def product_velocity_impl(
     """Return the top selling items sorted by quantity."""
     start_date, end_date = validate_date_range(start_date, end_date)
     sql = f"""
-    SELECT TOP (?) ItemID, ItemName,
+    SELECT TOP (:limit) ItemID, ItemName,
            SUM(QtySold) AS total_quantity,
            SUM(GrossSales) AS total_sales
     FROM {SALES_FACT_VIEW}
-    WHERE SaleDate BETWEEN ? AND ?
+    WHERE SaleDate BETWEEN :start_date AND :end_date
     """
-    params: List[Any] = [limit, start_date, end_date]
+    params: Dict[str, Any] = {"limit": limit, "start_date": start_date, "end_date": end_date}
     if site_id is not None:
-        sql += " AND SiteID = ?"
-        params.append(site_id)
+        sql += " AND SiteID = :site_id"
+        params["site_id"] = site_id
     sql += " GROUP BY ItemID, ItemName ORDER BY total_quantity DESC"
     try:
         results = execute_query(sql, params)

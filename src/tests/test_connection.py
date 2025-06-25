@@ -40,7 +40,7 @@ def test_execute_query_with_params(monkeypatch):
 
     class DummySession:
         def execute(self, query, params):
-            assert params == (1, 2)
+            assert params == {"a": 1, "b": 2}
             return DummyResult()
 
         def commit(self):
@@ -54,5 +54,5 @@ def test_execute_query_with_params(monkeypatch):
 
     monkeypatch.setattr(db, "get_session", dummy_get_session)
 
-    result = db.execute_query("SELECT ? + ? AS total", [1, 2])
+    result = db.execute_query("SELECT :a + :b AS total", {"a": 1, "b": 2})
     assert result == [{"total": 3}]

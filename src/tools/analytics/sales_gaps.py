@@ -15,11 +15,11 @@ async def sales_gaps_impl(
 ) -> Dict[str, Any]:
     """Return a list of dates where no sales exist."""
     start_date, end_date = validate_date_range(start_date, end_date)
-    sql = f"SELECT DISTINCT SaleDate FROM {SALES_FACT_VIEW} WHERE SaleDate BETWEEN ? AND ?"
-    params: List[Any] = [start_date, end_date]
+    sql = f"SELECT DISTINCT SaleDate FROM {SALES_FACT_VIEW} WHERE SaleDate BETWEEN :start_date AND :end_date"
+    params: Dict[str, Any] = {"start_date": start_date, "end_date": end_date}
     if site_id is not None:
-        sql += " AND SiteID = ?"
-        params.append(site_id)
+        sql += " AND SiteID = :site_id"
+        params["site_id"] = site_id
     try:
         rows = execute_query(sql, params)
         sold_dates = {row["SaleDate"] for row in rows}
