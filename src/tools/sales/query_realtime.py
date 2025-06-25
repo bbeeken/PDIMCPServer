@@ -119,6 +119,7 @@ query_sales_realtime_tool = Tool(
             },
         },
         "required": ["start_date", "end_date"],
+        "additionalProperties": False,
     },
 )
 

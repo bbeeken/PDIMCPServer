@@ -71,6 +71,7 @@ top_items_tool = Tool(
             "category": {"type": "string", "description": "Optional category filter"},
         },
         "required": ["start_date", "end_date"],
+        "additionalProperties": False,
     },
 )
 

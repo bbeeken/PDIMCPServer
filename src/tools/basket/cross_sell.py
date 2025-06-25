@@ -91,6 +91,7 @@ cross_sell_opportunities_tool = Tool(
             },
         },
         "required": ["item_id", "start_date", "end_date"],
+        "additionalProperties": False,
     },
 )
 

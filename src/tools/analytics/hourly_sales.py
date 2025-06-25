@@ -47,6 +47,7 @@ hourly_sales_tool = Tool(
             "site_id": {"type": "integer", "description": "Optional site filter"},
         },
         "required": ["start_date", "end_date"],
+        "additionalProperties": False,
     },
 )
 hourly_sales_tool._implementation = hourly_sales_impl

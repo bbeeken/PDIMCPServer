@@ -48,6 +48,7 @@ sales_gaps_tool = Tool(
             "site_id": {"type": "integer", "description": "Optional site filter"},
         },
         "required": ["start_date", "end_date"],
+        "additionalProperties": False,
     },
 )
 sales_gaps_tool._implementation = sales_gaps_impl

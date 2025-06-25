@@ -57,6 +57,7 @@ product_velocity_tool = Tool(
             },
         },
         "required": ["start_date", "end_date"],
+        "additionalProperties": False,
     },
 )
 product_velocity_tool._implementation = product_velocity_impl

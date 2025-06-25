@@ -134,6 +134,7 @@ basket_analysis_tool = Tool(
             "max_items": {"type": "integer", "description": "Maximum pairs to return"},
         },
         "required": ["start_date", "end_date"],
+        "additionalProperties": False,
     },
 )
 basket_analysis_tool._implementation = basket_analysis_impl
