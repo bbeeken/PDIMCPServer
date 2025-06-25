@@ -60,6 +60,7 @@ site_lookup_tool = Tool(
             },
         },
         "required": [],
+        "additionalProperties": False,
     },
 )
 site_lookup_tool._implementation = site_lookup_impl

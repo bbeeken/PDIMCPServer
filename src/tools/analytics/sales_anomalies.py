@@ -64,6 +64,7 @@ sales_anomalies_tool = Tool(
             },
         },
         "required": ["start_date", "end_date"],
+        "additionalProperties": False,
     },
 )
 sales_anomalies_tool._implementation = sales_anomalies_impl

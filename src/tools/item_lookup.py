@@ -59,6 +59,7 @@ item_lookup_tool = Tool(
             },
         },
         "required": [],
+        "additionalProperties": False,
     },
 )
 item_lookup_tool._implementation = item_lookup_impl

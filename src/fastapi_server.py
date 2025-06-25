@@ -12,8 +12,6 @@ from mcp.types import Tool
 
 from . import __version__
 
-from .tool_list import TOOLS
-
 from .mcp_server import create_server
 
 
@@ -25,14 +23,11 @@ SERVER_VERSION = os.getenv("MCP_SERVER_VERSION", __version__)
 
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
-    app = FastAPI(title=SERVER_NAME, version=SERVER_VERSION)
-
-
-    # Create one endpoint per tool so FastApiMCP can expose them as MCP tools
-    for tool in TOOLS:
-        schema = tool.inputSchema if isinstance(tool.inputSchema, dict) else {}
-
-        def make_endpoint(t: Tool) -> Any:
+    app = FastAPI(
+        title=SERVER_NAME,
+        version=SERVER_VERSION,
+        description="All endpoints reject unknown parameters with a 422 error.",
+    )
 
     server = create_server()
 
@@ -40,17 +35,40 @@ def create_app() -> FastAPI:
     for tool in server.tools:
         schema = tool.inputSchema if isinstance(tool.inputSchema, dict) else {}
 
-        def make_endpoint(t: Tool):
+        props = schema.get("properties", {})
+        example = {}
+        for name, prop in props.items():
+            t = prop.get("type")
+            if t == "integer":
+                example[name] = 0
+            elif t == "number":
+                example[name] = 0.0
+            elif t == "boolean":
+                example[name] = False
+            else:
+                example[name] = ""
+        openapi_schema = {**schema, "example": example}
 
+        def make_endpoint(t: Tool) -> Any:
             async def endpoint(
-                data: Dict[str, Any] = Body(..., json_schema_extra=schema)
+                data: Dict[str, Any] = Body(..., openapi_schema=openapi_schema)
             ) -> Any:
                 if not hasattr(t, "_implementation"):
                     raise HTTPException(
                         status_code=500,
                         detail=f"Tool {t.name} has no implementation",
                     )
-                return await t._implementation(**data)
+
+                allowed = set(schema.get("properties", {}))
+                extra_keys = set(data) - allowed
+                if extra_keys:
+                    raise HTTPException(
+                        status_code=422,
+                        detail=f"Unknown parameters: {', '.join(sorted(extra_keys))}",
+                    )
+
+                filtered_data = {k: v for k, v in data.items() if k in allowed}
+                return await t._implementation(**filtered_data)
 
             return endpoint
 
@@ -58,13 +76,7 @@ def create_app() -> FastAPI:
 
     @app.get("/tools")
     async def list_tools() -> List[Tool]:
-
-        return TOOLS
-
-    # Mount the MCP SSE interface and expose the underlying MCP server
-
         return server.tools
-
 
     mcp = FastApiMCP(app)
     mcp.mount()

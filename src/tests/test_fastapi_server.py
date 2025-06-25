@@ -60,3 +60,10 @@ def test_fastapi_call_tool(monkeypatch):
     assert resp.status_code == 200
     body = resp.json()
     assert body["result"] == "sales_summary"
+
+
+def test_reject_unknown_parameters(monkeypatch):
+    app = load_app(monkeypatch)
+    client = TestClient(app)
+    resp = client.post("/item_lookup", json={"item_id": 1, "bad": 1})
+    assert resp.status_code == 422
