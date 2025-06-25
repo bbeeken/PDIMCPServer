@@ -11,7 +11,11 @@ from fastapi_mcp import FastApiMCP
 from mcp.types import Tool
 
 from . import __version__
+
 from .tool_list import TOOLS
+
+from .mcp_server import create_server
+
 
 logger = logging.getLogger(__name__)
 
@@ -23,11 +27,21 @@ def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
     app = FastAPI(title=SERVER_NAME, version=SERVER_VERSION)
 
+
     # Create one endpoint per tool so FastApiMCP can expose them as MCP tools
     for tool in TOOLS:
         schema = tool.inputSchema if isinstance(tool.inputSchema, dict) else {}
 
         def make_endpoint(t: Tool) -> Any:
+
+    server = create_server()
+
+    # Create one endpoint per tool so FastApiMCP can expose them as MCP tools
+    for tool in server.tools:
+        schema = tool.inputSchema if isinstance(tool.inputSchema, dict) else {}
+
+        def make_endpoint(t: Tool):
+
             async def endpoint(
                 data: Dict[str, Any] = Body(..., json_schema_extra=schema)
             ) -> Any:
@@ -44,9 +58,14 @@ def create_app() -> FastAPI:
 
     @app.get("/tools")
     async def list_tools() -> List[Tool]:
+
         return TOOLS
 
     # Mount the MCP SSE interface and expose the underlying MCP server
+
+        return server.tools
+
+
     mcp = FastApiMCP(app)
     mcp.mount()
     app.state.mcp = mcp

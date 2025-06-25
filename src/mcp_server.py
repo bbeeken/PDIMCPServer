@@ -6,6 +6,13 @@ from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import Tool, TextContent
 
+
+from .tool_list import TOOLS
+
+from mcp.server import Server
+from mcp.types import Tool, TextContent
+
+
 # Import all tools
 from .tools.sales.query_realtime import query_sales_realtime_tool
 from .tools.sales.sales_summary import sales_summary_tool
@@ -22,9 +29,14 @@ from .tools.item_lookup import item_lookup_tool
 from .tools.get_today_date import get_today_date_tool
 
 
+
 def create_server() -> Server:
     """Create and configure the MCP server."""
     server = Server("mcp-pdi-sales")
+
+    tools: List[Tool] = TOOLS
+    server.tools = tools
+
 
     tools: List[Tool] = [
         # Sales tools
@@ -69,8 +81,7 @@ def create_server() -> Server:
 
                 return [
                     TextContent(
-                        type="text",
-                        text=json.dumps(result, indent=2, default=str),
+                        type="text", text=json.dumps(result, indent=2, default=str)
                     )
                 ]
             return [TextContent(type="text", text=str(result))]
@@ -85,6 +96,7 @@ def create_server() -> Server:
 async def run_server() -> None:
     """Run the MCP server over STDIO."""
     server = create_server()
+
     async with stdio_server() as (read_stream, write_stream):
         await server.run(
             read_stream,
@@ -92,6 +104,8 @@ async def run_server() -> None:
             server.create_initialization_options(),
         )
 
+
+    await server.run()
 
 if __name__ == "__main__":  # pragma: no cover - manual run
     import asyncio
