@@ -1,28 +1,6 @@
 """MCP PDI Server - Main server implementation"""
 
 from typing import Any, Dict, List
-
-
-from fastapi import FastAPI
-from fastapi_mcp import FastApiMCP
-from mcp.server import Server
-from mcp.server.stdio import stdio_server
-from mcp.types import Tool, TextContent
-
-from .fastapi_server import create_app
-from .tool_list import TOOLS
-
-
-def create_server() -> Server:
-    """Return the MCP server used by the FastAPI app."""
-    app: FastAPI = create_app()
-    mcp: FastApiMCP = app.state.mcp
-    server: Server = mcp.server
-
-    tools: List[Tool] = TOOLS
-    server.tools = tools
-
-
 from mcp.server import Server
 from mcp.types import Tool, TextContent
 
@@ -66,7 +44,6 @@ def create_server() -> Server:
         get_today_date_tool,
     ]
 
-
     @server.list_tools()
     async def list_tools() -> List[Tool]:
         return tools
@@ -90,21 +67,10 @@ def create_server() -> Server:
 
                 return [
                     TextContent(
-                        type="text",
-                        text=json.dumps(result, indent=2, default=str),
+                        type="text", text=json.dumps(result, indent=2, default=str)
                     )
                 ]
             return [TextContent(type="text", text=str(result))]
-
-        except Exception as exc:  # pragma: no cover - pass errors through
-            return [TextContent(type="text", text=str(exc))]
-
-    return server
-
-
-async def run_server() -> None:
-    """Run the MCP server over STDIO."""
-
         except Exception as exc:  # pragma: no cover - safety net
             return [TextContent(type="text", text=str(exc))]
 
@@ -114,19 +80,11 @@ async def run_server() -> None:
 
 async def run_server():
     """Run the MCP server."""
-
     server = create_server()
-    async with stdio_server() as (read_stream, write_stream):
-        await server.run(
-            read_stream,
-            write_stream,
-            server.create_initialization_options(),
-        )
-
+    await server.run()
 
 
 if __name__ == "__main__":  # pragma: no cover - manual run
-
     import asyncio
 
     asyncio.run(run_server())
