@@ -60,6 +60,7 @@ peak_hours_tool = Tool(
             },
         },
         "required": ["start_date", "end_date"],
+        "additionalProperties": False,
     },
 )
 peak_hours_tool._implementation = peak_hours_impl
