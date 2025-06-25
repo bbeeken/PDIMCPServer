@@ -1,6 +1,14 @@
-"""MCP PDI Server - Main server implementation"""
+"""MCP PDI Server - Main server implementation."""
 
 from typing import Any, Dict, List
+
+
+from mcp.server import Server
+from mcp.server.stdio import stdio_server
+from mcp.types import Tool, TextContent
+
+from .tool_list import TOOLS
+
 from mcp.server import Server
 from mcp.types import Tool, TextContent
 
@@ -20,9 +28,14 @@ from .tools.item_lookup import item_lookup_tool
 from .tools.get_today_date import get_today_date_tool
 
 
+
 def create_server() -> Server:
     """Create and configure the MCP server."""
     server = Server("mcp-pdi-sales")
+
+    tools: List[Tool] = TOOLS
+    server.tools = tools
+
 
     tools: List[Tool] = [
         # Sales tools
@@ -43,6 +56,7 @@ def create_server() -> Server:
         site_lookup_tool,
         get_today_date_tool,
     ]
+
 
     @server.list_tools()
     async def list_tools() -> List[Tool]:
@@ -71,6 +85,16 @@ def create_server() -> Server:
                     )
                 ]
             return [TextContent(type="text", text=str(result))]
+
+        except Exception as exc:  # pragma: no cover - pass errors through
+            return [TextContent(type="text", text=str(exc))]
+
+    return server
+
+
+async def run_server() -> None:
+    """Run the MCP server over STDIO."""
+
         except Exception as exc:  # pragma: no cover - safety net
             return [TextContent(type="text", text=str(exc))]
 
@@ -80,9 +104,9 @@ def create_server() -> Server:
 
 async def run_server():
     """Run the MCP server."""
+
     server = create_server()
     await server.run()
-
 
 if __name__ == "__main__":  # pragma: no cover - manual run
     import asyncio
