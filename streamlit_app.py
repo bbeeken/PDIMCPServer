@@ -4,11 +4,13 @@ import streamlit as st
 
 SERVER_URL = os.getenv("MCP_API_URL", "http://localhost:8000")
 
+
 @st.cache_data
 def load_tools():
     resp = httpx.get(f"{SERVER_URL}/tools")
     resp.raise_for_status()
     return resp.json()
+
 
 def main() -> None:
     st.title("MCP PDI Sales Tools")
@@ -48,7 +50,10 @@ def main() -> None:
     if submitted:
         with st.spinner("Calling tool..."):
             try:
-                resp = httpx.post(f"{SERVER_URL}/call", json={"name": selected_name, "arguments": args})
+                resp = httpx.post(
+                    f"{SERVER_URL}/call",
+                    json={"name": selected_name, "arguments": args},
+                )
                 resp.raise_for_status()
                 outputs = resp.json()
                 for content in outputs:
@@ -59,6 +64,6 @@ def main() -> None:
             except Exception as exc:  # pragma: no cover - external service
                 st.error(f"Error calling tool: {exc}")
 
+
 if __name__ == "__main__":  # pragma: no cover - manual execution
     main()
-
