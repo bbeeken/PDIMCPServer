@@ -26,3 +26,33 @@ def test_execute_query(monkeypatch):
     db = load_connection(monkeypatch)
     result = db.execute_query("SELECT 1 AS value")
     assert result == [{"value": 1}]
+
+
+def test_execute_query_with_params(monkeypatch):
+    db = load_connection(monkeypatch)
+
+    class DummyResult:
+        def keys(self):
+            return ["total"]
+
+        def fetchall(self):
+            return [(3,)]
+
+    class DummySession:
+        def execute(self, query, params):
+            assert params == (1, 2)
+            return DummyResult()
+
+        def commit(self):
+            pass
+
+    from contextlib import contextmanager
+
+    @contextmanager
+    def dummy_get_session():
+        yield DummySession()
+
+    monkeypatch.setattr(db, "get_session", dummy_get_session)
+
+    result = db.execute_query("SELECT ? + ? AS total", [1, 2])
+    assert result == [{"total": 3}]
