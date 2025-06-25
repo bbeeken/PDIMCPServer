@@ -2,15 +2,16 @@
 
 from typing import Any, Dict, List
 
-
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import Tool, TextContent
+
 
 from .tool_list import TOOLS
 
 from mcp.server import Server
 from mcp.types import Tool, TextContent
+
 
 # Import all tools
 from .tools.sales.query_realtime import query_sales_realtime_tool
@@ -57,7 +58,6 @@ def create_server() -> Server:
         get_today_date_tool,
     ]
 
-
     @server.list_tools()
     async def list_tools() -> List[Tool]:
         return tools
@@ -89,23 +89,22 @@ def create_server() -> Server:
         except Exception as exc:  # pragma: no cover - pass errors through
             return [TextContent(type="text", text=str(exc))]
 
+    server.tools = tools
     return server
 
 
 async def run_server() -> None:
     """Run the MCP server over STDIO."""
-
-        except Exception as exc:  # pragma: no cover - safety net
-            return [TextContent(type="text", text=str(exc))]
-
-    server.tools = tools
-    return server
-
-
-async def run_server():
-    """Run the MCP server."""
-
     server = create_server()
+
+    async with stdio_server() as (read_stream, write_stream):
+        await server.run(
+            read_stream,
+            write_stream,
+            server.create_initialization_options(),
+        )
+
+
     await server.run()
 
 if __name__ == "__main__":  # pragma: no cover - manual run
