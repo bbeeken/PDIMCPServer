@@ -9,6 +9,8 @@ from typing import Any, Dict, List
 from fastapi import Body, FastAPI, HTTPException
 from fastapi_mcp import FastApiMCP
 from mcp.types import Tool
+from dotenv import load_dotenv
+load_dotenv()
 
 from . import __version__
 

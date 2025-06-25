@@ -1,40 +1,59 @@
-"""
-SQLAlchemy engine configuration
-"""
+"""Database engine configuration."""
 
 import os
+import logging
+from urllib.parse import quote_plus
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import QueuePool
-from dotenv import load_dotenv
+from sqlalchemy.ext.declarative import declarative_base
 
-load_dotenv()
+logger = logging.getLogger(__name__)
 
-# Build connection URL
-DATABASE_URL = os.getenv("DATABASE_URL")
-if not DATABASE_URL:
-    # Build from components
-    server = os.getenv("DB_SERVER")
-    database = os.getenv("DB_DATABASE")
-    username = os.getenv("DB_USERNAME")
-    password = os.getenv("DB_PASSWORD")
+# Get environment variables
+DB_USERNAME = os.getenv('DB_USERNAME')
+DB_PASSWORD = os.getenv('DB_PASSWORD')
+DB_SERVER = os.getenv('DB_SERVER')
+DB_DATABASE = os.getenv('DB_DATABASE')
+ODBC_DRIVER = os.getenv('ODBC_DRIVER', 'ODBC Driver 17 for SQL Server')
+POOL_SIZE = int(os.getenv('POOL_SIZE', '10'))
+MAX_OVERFLOW = int(os.getenv('MAX_OVERFLOW', '20'))
 
-    # Use the pyodbc driver with an explicit ODBC driver name
-    driver = os.getenv("ODBC_DRIVER", "ODBC Driver 18 for SQL Server")
-    driver_param = driver.replace(" ", "+")
-    DATABASE_URL = (
-        f"mssql+pyodbc://{username}:{password}@{server}/{database}?driver={driver_param}"
-    )
+# Validate required environment variables
+if not all([DB_USERNAME, DB_PASSWORD, DB_SERVER, DB_DATABASE]):
+    missing = []
+    if not DB_USERNAME: missing.append('DB_USERNAME')
+    if not DB_PASSWORD: missing.append('DB_PASSWORD')
+    if not DB_SERVER: missing.append('DB_SERVER')
+    if not DB_DATABASE: missing.append('DB_DATABASE')
+    raise ValueError(f"Missing required environment variables: {', '.join(missing)}")
 
-# Create engine with connection pooling
+# URL-encode password to handle special characters
+encoded_password = quote_plus(DB_PASSWORD)
+
+# Construct the database URL properly
+DATABASE_URL = (
+    f"mssql+pyodbc://{DB_USERNAME}:{encoded_password}@{DB_SERVER}/{DB_DATABASE}"
+    f"?driver={ODBC_DRIVER.replace(' ', '+')}"
+)
+
+# Optional: Add additional connection parameters
+# DATABASE_URL += "&TrustServerCertificate=yes"  # For self-signed certificates
+# DATABASE_URL += "&Encrypt=yes"  # For encrypted connections
+
+logger.info(f"Connecting to SQL Server: {DB_SERVER}/{DB_DATABASE}")
+
+# Create the engine
 engine = create_engine(
     DATABASE_URL,
-    pool_size=int(os.getenv("POOL_SIZE", "10")),
-    max_overflow=int(os.getenv("MAX_OVERFLOW", "20")),
+    pool_size=POOL_SIZE,
+    max_overflow=MAX_OVERFLOW,
     pool_pre_ping=True,  # Verify connections before using
-    poolclass=QueuePool,
     echo=False,  # Set to True for SQL debugging
 )
 
-# Session factory
+# Create session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Base class for declarative models
+Base = declarative_base()
