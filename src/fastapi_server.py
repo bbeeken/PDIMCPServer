@@ -48,7 +48,6 @@ def create_app() -> FastAPI:
     async def list_tools() -> List[Tool]:
         return server.tools
 
-    # Mount the MCP SSE interface and expose the underlying MCP server
     mcp = FastApiMCP(app)
     mcp.mount()
     app.state.mcp = mcp
