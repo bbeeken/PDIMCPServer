@@ -24,12 +24,12 @@ async def basket_metrics_impl(
         SUM(GrossSales) AS total_sales,
         AVG(QtySold) AS avg_items_per_tx
     FROM {SALES_FACT_VIEW}
-    WHERE SaleDate BETWEEN ? AND ?
+    WHERE SaleDate BETWEEN :start_date AND :end_date
     """
-    params = [start_date, end_date]
+    params = {"start_date": start_date, "end_date": end_date}
     if site_id is not None:
-        sql += " AND SiteID = ?"
-        params.append(site_id)
+        sql += " AND SiteID = :site_id"
+        params["site_id"] = site_id
 
     try:
         results = execute_query(sql, params)

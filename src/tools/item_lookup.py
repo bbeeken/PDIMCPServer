@@ -13,7 +13,7 @@ async def item_lookup_impl(
 ) -> Dict[str, Any]:
     """Search ``dbo.Product`` by item ID or description."""
     sql = """
-    SELECT TOP (?)
+    SELECT TOP (:limit)
         Item_ID AS item_id,
         Item_Desc AS description,
         Category_Desc AS category,
@@ -23,13 +23,13 @@ async def item_lookup_impl(
     FROM dbo.Product
     WHERE 1=1
     """
-    params = [limit]
+    params = {"limit": limit}
     if item_id is not None:
-        sql += " AND Item_ID = ?"
-        params.append(item_id)
+        sql += " AND Item_ID = :item_id"
+        params["item_id"] = item_id
     if description:
-        sql += " AND Item_Desc LIKE ?"
-        params.append(f"%{description}%")
+        sql += " AND Item_Desc LIKE :description"
+        params["description"] = f"%{description}%"
     sql += " ORDER BY Item_Desc"
     try:
         results = execute_query(sql, params)

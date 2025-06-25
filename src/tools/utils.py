@@ -4,7 +4,7 @@ Shared utilities for tools
 
 import json
 from datetime import datetime, date
-from typing import Any, List, Dict, Optional
+from typing import Any, List, Dict, Optional, Union
 import logging
 from sqlalchemy import text
 
@@ -29,21 +29,31 @@ def format_date(date_input: Any) -> str:
         raise ValueError(f"Invalid date format: {date_input}")
 
 
-def build_debug_sql(sql: str, params: List[Any]) -> str:
+def build_debug_sql(sql: str, params: Union[List[Any], Dict[str, Any]]) -> str:
     """Build SQL string with parameters for debugging"""
     debug_sql = sql
-    for param in params:
-        if isinstance(param, str):
-            value = f"'{param}'"
-        elif isinstance(param, (date, datetime)):
-            value = f"'{param}'"
-        elif param is None:
-            value = "NULL"
-        else:
-            value = str(param)
-
-        debug_sql = debug_sql.replace("?", value, 1)
-
+    if isinstance(params, dict):
+        for key, param in params.items():
+            if isinstance(param, str):
+                value = f"'{param}'"
+            elif isinstance(param, (date, datetime)):
+                value = f"'{param}'"
+            elif param is None:
+                value = "NULL"
+            else:
+                value = str(param)
+            debug_sql = debug_sql.replace(f":{key}", value)
+    else:
+        for param in params:
+            if isinstance(param, str):
+                value = f"'{param}'"
+            elif isinstance(param, (date, datetime)):
+                value = f"'{param}'"
+            elif param is None:
+                value = "NULL"
+            else:
+                value = str(param)
+            debug_sql = debug_sql.replace("?", value, 1)
     return debug_sql
 
 
@@ -67,7 +77,7 @@ def safe_divide(numerator: float, denominator: float, default: float = 0.0) -> f
 def create_tool_response(
     data: Any,
     sql: str,
-    params: List[Any],
+    params: Union[List[Any], Dict[str, Any]],
     metadata: Optional[Dict[str, Any]] = None,
     error: Optional[str] = None,
 ) -> Dict[str, Any]:

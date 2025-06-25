@@ -25,15 +25,15 @@ async def year_over_year_impl(
         SUM(QtySold) AS TotalQuantity,
         COUNT(DISTINCT TransactionID) AS TransactionCount
     FROM {SALES_FACT_VIEW}
-    WHERE SaleDate BETWEEN ? AND ?
+    WHERE SaleDate BETWEEN :start_date AND :end_date
     """
 
     def run_query(s: str, e: str):
-        params = [s, e]
+        params = {"start_date": s, "end_date": e}
         query = base_sql
         if site_id:
-            query += " AND SiteID = ?"
-            params.append(site_id)
+            query += " AND SiteID = :site_id"
+            params["site_id"] = site_id
         rows = execute_query(query, params)
         return (
             (
@@ -73,8 +73,8 @@ async def year_over_year_impl(
         "site_id": site_id,
     }
     debug_sql = f"Current: {sql_curr} | Previous: {sql_prev}"
-    params = params_curr + params_prev
-    return create_tool_response(data, debug_sql, params, metadata)
+    merged_params = {**params_curr, **{f"prev_{k}": v for k, v in params_prev.items()}}
+    return create_tool_response(data, debug_sql, merged_params, metadata)
 
 
 year_over_year_tool = Tool(

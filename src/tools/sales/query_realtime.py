@@ -25,7 +25,7 @@ async def query_sales_realtime_impl(
 
     # Build query
     sql = f"""
-    SELECT TOP (?)
+    SELECT TOP (:limit)
         TransactionID,
         SaleDate,
         DayOfWeek,
@@ -40,30 +40,30 @@ async def query_sales_realtime_impl(
         Price,
         GrossSales
     FROM {SALES_FACT_VIEW}
-    WHERE SaleDate BETWEEN ? AND ?
+    WHERE SaleDate BETWEEN :start_date AND :end_date
     """
 
-    params = [limit, start_date, end_date]
+    params = {"limit": limit, "start_date": start_date, "end_date": end_date}
 
     # Add optional filters
     if item_id:
-        sql += " AND ItemID = ?"
-        params.append(item_id)
+        sql += " AND ItemID = :item_id"
+        params["item_id"] = item_id
     elif item_name:
-        sql += " AND ItemName LIKE ?"
-        params.append(f"%{item_name}%")
+        sql += " AND ItemName LIKE :item_name"
+        params["item_name"] = f"%{item_name}%"
 
     if site_id:
-        sql += " AND SiteID = ?"
-        params.append(site_id)
+        sql += " AND SiteID = :site_id"
+        params["site_id"] = site_id
 
     if category:
-        sql += " AND Category LIKE ?"
-        params.append(f"%{category}%")
+        sql += " AND Category LIKE :category"
+        params["category"] = f"%{category}%"
 
     if min_amount:
-        sql += " AND GrossSales >= ?"
-        params.append(min_amount)
+        sql += " AND GrossSales >= :min_amount"
+        params["min_amount"] = min_amount
 
     sql += " ORDER BY SaleDate DESC, TimeOfDay DESC"
 

@@ -2,7 +2,7 @@
 
 import logging
 from contextlib import contextmanager
-from typing import Optional, Any, List
+from typing import Optional, Any, List, Dict, Union
 
 from sqlalchemy import text
 
@@ -25,9 +25,9 @@ def get_session() -> Any:
         session.close()
 
 
-def execute_query(sql: str, params: Optional[List[Any]] = None) -> list:
+def execute_query(sql: str, params: Optional[Union[Dict[str, Any], List[Any]]] = None) -> list:
     """Execute a SQL statement and return rows as dicts."""
-    bound = tuple(params) if params else ()
+    bound = params or {}
     with get_session() as session:
         result = session.execute(text(sql), bound)
         columns = result.keys()

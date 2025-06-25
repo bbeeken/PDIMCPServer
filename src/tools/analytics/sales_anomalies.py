@@ -21,12 +21,12 @@ async def sales_anomalies_impl(
     sql = f"""
     SELECT SaleDate, SUM(GrossSales) AS total_sales
     FROM {SALES_FACT_VIEW}
-    WHERE SaleDate BETWEEN ? AND ?
+    WHERE SaleDate BETWEEN :start_date AND :end_date
     """
-    params: List[Any] = [start_date, end_date]
+    params: Dict[str, Any] = {"start_date": start_date, "end_date": end_date}
     if site_id is not None:
-        sql += " AND SiteID = ?"
-        params.append(site_id)
+        sql += " AND SiteID = :site_id"
+        params["site_id"] = site_id
     sql += " GROUP BY SaleDate ORDER BY SaleDate"
     try:
         rows = execute_query(sql, params)

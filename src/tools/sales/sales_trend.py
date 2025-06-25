@@ -53,18 +53,18 @@ async def sales_trend_impl(
         {interval_sql},
         {metric_sql} AS {metric_alias}
     FROM {SALES_FACT_VIEW}
-    WHERE SaleDate BETWEEN ? AND ?
+    WHERE SaleDate BETWEEN :start_date AND :end_date
     """
 
-    params = [start_date, end_date]
+    params = {"start_date": start_date, "end_date": end_date}
 
     if site_id:
-        sql += " AND SiteID = ?"
-        params.append(site_id)
+        sql += " AND SiteID = :site_id"
+        params["site_id"] = site_id
 
     if category:
-        sql += " AND Category LIKE ?"
-        params.append(f"%{category}%")
+        sql += " AND Category LIKE :category"
+        params["category"] = f"%{category}%"
 
     group_cols = ", ".join(part.split(" as ")[0] for part in interval_sql.split(", "))
     sql += f" GROUP BY {group_cols}"

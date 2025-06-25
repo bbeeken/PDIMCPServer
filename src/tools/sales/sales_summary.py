@@ -51,7 +51,7 @@ async def sales_summary_impl(
         group_part = ""
 
     sql = f"""
-    SELECT 
+    SELECT
         {select_part}
         COUNT(DISTINCT TransactionID) as TransactionCount,
         COUNT(DISTINCT ItemID) as UniqueItems,
@@ -59,18 +59,18 @@ async def sales_summary_impl(
         SUM(GrossSales) as TotalSales,
         AVG(GrossSales) as AvgSaleAmount
     FROM {SALES_FACT_VIEW}
-    WHERE SaleDate BETWEEN ? AND ?
+    WHERE SaleDate BETWEEN :start_date AND :end_date
     """
 
-    params = [start_date, end_date]
+    params = {"start_date": start_date, "end_date": end_date}
 
     if site_id:
-        sql += " AND SiteID = ?"
-        params.append(site_id)
+        sql += " AND SiteID = :site_id"
+        params["site_id"] = site_id
 
     if category:
-        sql += " AND Category LIKE ?"
-        params.append(f"%{category}%")
+        sql += " AND Category LIKE :category"
+        params["category"] = f"%{category}%"
 
     sql += f" {group_part}"
 
