@@ -25,11 +25,15 @@ def get_session() -> Any:
         session.close()
 
 
+
 def execute_query(sql: str, params: Optional[Union[Dict[str, Any], List[Any]]] = None) -> list:
+
+
     """Execute a SQL statement and return rows as dicts."""
     bound = params or {}
     with get_session() as session:
         result = session.execute(text(sql), bound)
+
         columns = result.keys()
         rows = result.fetchall()
         return [dict(zip(columns, row)) for row in rows]
