@@ -22,16 +22,17 @@
         "basket": [
           "basket_analysis",
           "item_correlation",
-          "basket_metrics",
           "cross_sell_opportunities"
         ],
         "analytics": [
           "daily_report",
           "hourly_sales",
-          "daily_report",
+          "peak_hours",
+          "sales_anomalies",
+          "product_velocity",
+          "low_movement",
           "sales_gaps",
           "year_over_year"
-
         ]
       }
     }

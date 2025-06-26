@@ -27,32 +27,36 @@ Return totals over time using an `interval` of `daily`, `weekly`, `monthly`, or
 
 ### `hourly_sales`
 
-Summarise quantities, sales totals and transaction counts for each hour within a
-date range. Accepts an optional `site_id` filter.
+Summarise quantities, sales totals and transaction counts for each hour between
+`start_date` and `end_date`. Accepts an optional `site_id` filter.
 
 ### `daily_report`
 
-Generate a simple per-day report of sales and transaction totals. Call
-`POST /daily_report` with `start_date` and `end_date` like the other tools.
+Generate a simple per-day report of sales and transaction totals between
+`start_date` and `end_date`. Optional filters include `site_id`, `item_id`,
+`item_name` and `category`.
 
 ### `peak_hours`
 
-Return the hours of the day with the greatest sales totals. Supports optional
-`site_id` filtering and limiting the number of results.
+Return the hours of the day with the highest sales totals between `start_date`
+and `end_date`. Supports optional `site_id` filtering and limiting the number of
+results via `top_n`.
 
 ### `sales_anomalies`
 
-Highlight dates where total sales deviate from the average by a configurable
-number of standard deviations.
+Highlight dates within `start_date` and `end_date` where total sales deviate
+from the mean by more than `z_score` standard deviations. `site_id` is optional.
 
 ### `product_velocity`
 
-List the fastest selling items ranked by quantity. You can filter by `site_id`
-and control how many items are returned.
+List the fastest selling items between `start_date` and `end_date` ranked by
+quantity. Optional `site_id` filtering and a `limit` parameter control the
+number of results.
 
 ### `low_movement`
 
-Identify slow-moving items whose quantity sold is below a given threshold.
+Identify items selling below a `threshold` between `start_date` and `end_date`.
+Optionally filter by `site_id`.
 
 ## Installation
 
