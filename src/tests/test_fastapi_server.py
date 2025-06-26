@@ -21,6 +21,7 @@ def load_app(monkeypatch):
         ("src.tools.basket.item_correlation", "item_correlation_tool"),
         ("src.tools.basket.cross_sell", "cross_sell_opportunities_tool"),
         ("src.tools.basket.basket_metrics", "basket_metrics_tool"),
+        ("src.tools.basket.transaction_lookup", "transaction_lookup_tool"),
         ("src.tools.analytics.daily_report", "daily_report_tool"),
         ("src.tools.analytics.hourly_sales", "hourly_sales_tool"),
         ("src.tools.analytics.peak_hours", "peak_hours_tool"),
@@ -85,6 +86,15 @@ def test_item_lookup_valid(monkeypatch):
     client = TestClient(app)
     resp = client.post("/item_lookup", json={"item_id": 1})
     assert resp.status_code == 200
+
+
+def test_transaction_lookup_call(monkeypatch):
+    app = load_app(monkeypatch)
+    client = TestClient(app)
+    resp = client.post("/transaction_lookup", json={"transaction_id": 1})
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["result"] == "transaction_lookup"
 
 def test_openapi_examples(monkeypatch):
     app = load_app(monkeypatch)

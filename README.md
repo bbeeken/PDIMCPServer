@@ -63,9 +63,28 @@ Optionally filter by `site_id`.
 
 Forecast daily sales for `horizon` days beyond the selected range using a Prophet model. Provide `start_date` and `end_date` for the training data.
 
+
 ### `basket_metrics`
 
 Compute overall basket-level metrics like transaction counts, total quantity, total sales, and the average number of items per transaction between `start_date` and `end_date`. Optionally filter by `site_id`.
+
+
+### `cross_sell_opportunities`
+
+Identify the items most often bought alongside a given product. Example parameters: `item_id=100`, `start_date="2024-01-01"`, `end_date="2024-01-31"`, `site_id=1`, `top_n=5`.
+
+### `item_correlation`
+
+Analyse baskets containing a target item to surface other products that frequently appear with it. Example parameters: `item_id=100`, `start_date="2024-01-01"`, `end_date="2024-01-31"`, `min_frequency=5`, `top_n=20`.
+
+### `transaction_lookup`
+
+Return the line items, quantities and totals for a specific `transaction_id`. Example: `transaction_id=123456`.
+### `transaction_lookup`
+
+Return all line items associated with a given `transaction_id`. An optional `site_id` parameter restricts results to a specific location.
+ 
+ 
 
 ## Installation
 
@@ -85,6 +104,10 @@ settings. The variables `DB_SERVER`, `DB_DATABASE`, `DB_USERNAME`, and
 `pyodbc` driver ("ODBC Driver 18 for SQL Server" by default). Additional options like `POOL_SIZE` and `MAX_OVERFLOW`
 control connection pooling. See the example file for the full list of
 supported variables.
+
+The application automatically loads variables from this `.env` file
+using **python-dotenv** when the database engine module is imported, so
+no additional configuration is required.
 
 
 ## Running the FastAPI server
@@ -139,3 +162,8 @@ To verify the MCP server can be created without starting the HTTP API run:
 ```bash
 python scripts/smoke_test_server.py
 ```
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
