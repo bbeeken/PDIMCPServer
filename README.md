@@ -82,6 +82,10 @@ settings. The variables `DB_SERVER`, `DB_DATABASE`, `DB_USERNAME`, and
 control connection pooling. See the example file for the full list of
 supported variables.
 
+The application automatically loads variables from this `.env` file
+using **python-dotenv** when the database engine module is imported, so
+no additional configuration is required.
+
 
 ## Running the FastAPI server
 
