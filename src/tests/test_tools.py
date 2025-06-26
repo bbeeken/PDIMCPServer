@@ -44,3 +44,12 @@ def test_tool_registration(monkeypatch):
     assert hasattr(server, "run")
     assert len(server.tools) == 13
     assert all(hasattr(t, "name") for t in server.tools)
+
+
+def test_daily_report_schema():
+    from src.tools.analytics.daily_report import daily_report_tool
+
+    props = daily_report_tool.inputSchema["properties"]
+    assert "item_id" in props
+    assert "item_name" in props
+    assert "category" in props
