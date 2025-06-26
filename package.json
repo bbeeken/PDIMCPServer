@@ -22,7 +22,8 @@
         "basket": [
           "basket_analysis",
           "item_correlation",
-          "cross_sell_opportunities"
+          "cross_sell_opportunities",
+          "transaction_lookup"
         ],
         "analytics": [
           "daily_report",
