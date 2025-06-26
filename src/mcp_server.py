@@ -67,9 +67,6 @@ async def run_server() -> None:
             server.create_initialization_options(),
         )
 
-
-    await server.run()
-
 if __name__ == "__main__":  # pragma: no cover - manual run
     import asyncio
 
