@@ -167,95 +167,6 @@ def has_size_match(description: str, query_components: QueryComponents) -> bool:
     return False
 
 # ────────────────────────────────────────────────────────────────
-# Size and Product Extraction
-# ────────────────────────────────────────────────────────────────
-
-def extract_size_and_product(query: str) -> QueryComponents:
-    """Extract size and product components from query with size normalization."""
-    original = query.strip()
-    query_lower = query.lower().strip()
-    
-    # Common size patterns
-    size_patterns = [
-        (r'(\d+(?:\.\d+)?)\s*oz\b', lambda m: f"{m.group(1)}oz"),
-        (r'(\d+(?:\.\d+)?)\s*ounce(?:s)?\b', lambda m: f"{m.group(1)}oz"),
-        (r'(\d+(?:\.\d+)?)\s*ml\b', lambda m: f"{m.group(1)}ml"),
-        (r'(\d+(?:\.\d+)?)\s*liter?(?:s)?\b', lambda m: f"{m.group(1)}l"),
-        (r'(\d+(?:\.\d+)?)\s*lb(?:s)?\b', lambda m: f"{m.group(1)}lb"),
-        (r'(\d+(?:\.\d+)?)\s*pound(?:s)?\b', lambda m: f"{m.group(1)}lb"),
-        (r'(\d+)\s*pack?\b', lambda m: f"{m.group(1)}pk"),
-        (r'(\d+)\s*ct\b', lambda m: f"{m.group(1)}ct"),
-        (r'(\d+)\s*count\b', lambda m: f"{m.group(1)}ct"),
-    ]
-    
-    size = None
-    size_variants = []
-    product_name = query_lower
-    
-    for pattern, normalizer in size_patterns:
-        match = re.search(pattern, query_lower)
-        if match:
-            size = normalizer(match)
-            
-            # Generate size variants for better matching
-            if 'oz' in size:
-                base_num = match.group(1)
-                size_variants = [
-                    f"{base_num}oz", f"{base_num} oz", f"{base_num}OZ", f"{base_num} OZ",
-                    f"{base_num}ounce", f"{base_num} ounce", f"{base_num} ounces"
-                ]
-            elif 'ml' in size:
-                base_num = match.group(1)
-                size_variants = [f"{base_num}ml", f"{base_num} ml", f"{base_num}ML", f"{base_num} ML"]
-            # Add more variant patterns as needed
-            
-            # Remove size from product name
-            product_name = re.sub(pattern, '', query_lower).strip()
-            break
-    
-    return QueryComponents(
-        original_query=original,
-        product_name=product_name,
-        size=size,
-        size_variants=size_variants
-    )
-
-def detect_variant_type(description: str) -> str:
-    """Detect if item is regular, diet, flavored, etc."""
-    desc_upper = description.upper()
-    
-    # Diet/Zero variants
-    if any(term in desc_upper for term in ['DIET', 'ZERO', 'LIGHT', 'LITE']):
-        return "diet"
-    
-    # Flavored variants
-    flavor_terms = ['CHERRY', 'VANILLA', 'LEMON', 'LIME', 'ORANGE', 'GRAPE', 'STRAWBERRY', 
-                   'PEACH', 'MANGO', 'BERRY', 'MINT', 'CHOCOLATE']
-    if any(term in desc_upper for term in flavor_terms):
-        return "flavored"
-    
-    # Energy/functional
-    if any(term in desc_upper for term in ['ENERGY', 'CAFFEINE', 'PLUS', 'MAX']):
-        return "functional"
-    
-    # Regular variant (most basic form)
-    return "regular"
-
-def has_size_match(description: str, query_components: QueryComponents) -> bool:
-    """Check if description contains the size from query."""
-    if not query_components.size or not query_components.size_variants:
-        return False
-    
-    desc_upper = description.upper()
-    
-    # Check all size variants
-    for variant in query_components.size_variants:
-        if variant.upper() in desc_upper:
-            return True
-    
-    return False
-
-# ────────────────────────────────────────────────────────────────
 # Text Preprocessing and Normalization
 # ────────────────────────────────────────────────────────────────
 
@@ -380,30 +291,6 @@ def score_item_multi_field(query: str, item: Dict[str, Any], config: SearchConfi
         size_match=size_match,
         variant_type=variant_type
     )
-
-# ────────────────────────────────────────────────────────────────
-# Smart Result Selection
-# ────────────────────────────────────────────────────────────────
-
-def select_best_match(scored_results: List[ScoringResult], query_components: QueryComponents, 
-                     config: SearchConfig) -> List[ScoringResult]:
-    """Apply intelligent result selection based on query context."""
-    if not scored_results:
-        return []
-    
-    # Sort by business score (not just fuzzy score)
-    scored_results.sort(key=lambda x: x.business_score, reverse=True)
-    
-    # If we have a high-confidence match with size match, return just that one
-    if (query_components.size and 
-        scored_results[0].business_score >= config.high_confidence_threshold and
-        scored_results[0].size_match):
-        
-        # Return the single best match for sized queries
-        return [scored_results[0]]
-    
-    # For non-sized queries or lower confidence, return multiple results
-    return scored_results
 
 # ────────────────────────────────────────────────────────────────
 # Smart Result Selection
