@@ -35,6 +35,25 @@ date range. Accepts an optional `site_id` filter.
 Generate a simple per-day report of sales and transaction totals. Call
 `POST /daily_report` with `start_date` and `end_date` like the other tools.
 
+### `peak_hours`
+
+Return the hours of the day with the greatest sales totals. Supports optional
+`site_id` filtering and limiting the number of results.
+
+### `sales_anomalies`
+
+Highlight dates where total sales deviate from the average by a configurable
+number of standard deviations.
+
+### `product_velocity`
+
+List the fastest selling items ranked by quantity. You can filter by `site_id`
+and control how many items are returned.
+
+### `low_movement`
+
+Identify slow-moving items whose quantity sold is below a given threshold.
+
 ## Installation
 
 1. Clone the repository:
