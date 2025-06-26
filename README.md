@@ -18,7 +18,8 @@ POST route.
 ### `sales_summary`
 
 Aggregate KPIs between two dates. Use the `group_by` array to break down the
-results by `date`, `hour`, `site`, `category`, or `department`.
+results by `date`, `hour`, `site`, `category`, or `department`. You can also
+filter by a specific item using `item_id` or `item_name`.
 
 ### `sales_trend`
 
