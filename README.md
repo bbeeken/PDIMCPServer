@@ -63,6 +63,18 @@ Optionally filter by `site_id`.
 
 Forecast daily sales for `horizon` days beyond the selected range using a Prophet model. Provide `start_date` and `end_date` for the training data.
 
+### `cross_sell_opportunities`
+
+Identify the items most often bought alongside a given product. Example parameters: `item_id=100`, `start_date="2024-01-01"`, `end_date="2024-01-31"`, `site_id=1`, `top_n=5`.
+
+### `item_correlation`
+
+Analyse baskets containing a target item to surface other products that frequently appear with it. Example parameters: `item_id=100`, `start_date="2024-01-01"`, `end_date="2024-01-31"`, `min_frequency=5`, `top_n=20`.
+
+### `transaction_lookup`
+
+Return the line items, quantities and totals for a specific `transaction_id`. Example: `transaction_id=123456`.
+
 ## Installation
 
 1. Clone the repository:
