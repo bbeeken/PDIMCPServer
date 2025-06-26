@@ -15,6 +15,7 @@ from .tools.analytics.product_velocity import product_velocity_tool
 from .tools.analytics.low_movement import low_movement_tool
 from .tools.analytics.sales_gaps import sales_gaps_tool
 from .tools.analytics.year_over_year import year_over_year_tool
+from .tools.analytics.daily_report import daily_report_tool
 from .tools.item_lookup import item_lookup_tool
 from .tools.site_lookup import site_lookup_tool
 from .tools.get_today_date import get_today_date_tool
@@ -33,6 +34,7 @@ TOOLS: list[Tool] = [
     sales_anomalies_tool,
     product_velocity_tool,
     low_movement_tool,
+    daily_report_tool,
     sales_gaps_tool,
     year_over_year_tool,
     item_lookup_tool,

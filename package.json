@@ -28,6 +28,7 @@
         "analytics": [
           "daily_report",
           "hourly_sales",
+          "daily_report",
           "sales_gaps",
           "year_over_year"
 
