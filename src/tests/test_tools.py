@@ -51,7 +51,7 @@ def test_tool_registration(monkeypatch):
     mcp_server = load_server(monkeypatch)
     server = mcp_server.create_server()
     assert hasattr(server, "run")
-    assert len(server.tools) == 20
+    assert len(server.tools) == 21
     assert all(hasattr(t, "name") for t in server.tools)
 
 
