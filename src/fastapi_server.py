@@ -1,21 +1,17 @@
-"""FastAPI wrapper exposing MCP tools with SSE support."""
+"""FastAPI wrapper exposing MCP tools with SSE support - Fixed for n8n compatibility."""
 
 from __future__ import annotations
 
 import logging
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from fastapi import Body, FastAPI, HTTPException
 from fastapi_mcp import FastApiMCP
 from mcp.types import Tool
-from dotenv import load_dotenv
-load_dotenv()
 
 from . import __version__
-
 from .mcp_server import create_server
-
 
 logger = logging.getLogger(__name__)
 
@@ -64,27 +60,47 @@ def create_app() -> FastAPI:
         def make_endpoint(
             t: Tool, schema: Dict[str, Any], openapi_schema: Dict[str, Any]
         ) -> Any:
-            async def endpoint(
-                data: Dict[str, Any] = Body(..., json_schema_extra=openapi_schema)
-            ) -> Any:
-                if not hasattr(t, "_implementation"):
-                    raise HTTPException(
-                        status_code=500,
-                        detail=f"Tool {t.name} has no implementation",
-                    )
+            # Check if this tool has any properties
+            has_properties = bool(schema.get("properties", {}))
+            
+            if has_properties:
+                # Tool has parameters - body is required
+                async def endpoint_with_body(
+                    data: Dict[str, Any] = Body(..., json_schema_extra=openapi_schema)
+                ) -> Any:
+                    if not hasattr(t, "_implementation"):
+                        raise HTTPException(
+                            status_code=500,
+                            detail=f"Tool {t.name} has no implementation",
+                        )
 
-                allowed = set(schema.get("properties", {}))
-                extra_keys = set(data) - allowed
-                if extra_keys:
-                    raise HTTPException(
-                        status_code=422,
-                        detail=f"Unknown parameters: {', '.join(sorted(extra_keys))}",
-                    )
+                    allowed = set(schema.get("properties", {}))
+                    extra_keys = set(data) - allowed
+                    if extra_keys:
+                        raise HTTPException(
+                            status_code=422,
+                            detail=f"Unknown parameters: {', '.join(sorted(extra_keys))}",
+                        )
 
-                filtered_data = {k: v for k, v in data.items() if k in allowed}
-                return await t._implementation(**filtered_data)
-
-            return endpoint
+                    filtered_data = {k: v for k, v in data.items() if k in allowed}
+                    return await t._implementation(**filtered_data)
+                
+                return endpoint_with_body
+            else:
+                # Tool has no parameters - body is optional
+                async def endpoint_no_body(
+                    data: Optional[Dict[str, Any]] = Body(default={}, json_schema_extra=openapi_schema)
+                ) -> Any:
+                    if not hasattr(t, "_implementation"):
+                        raise HTTPException(
+                            status_code=500,
+                            detail=f"Tool {t.name} has no implementation",
+                        )
+                    
+                    # For tools with no parameters, just call the implementation
+                    return await t._implementation()
+                
+                return endpoint_no_body
 
         app.post(f"/{tool.name}", operation_id=tool.name)(
             make_endpoint(tool, schema, openapi_schema)
