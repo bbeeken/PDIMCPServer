@@ -23,7 +23,7 @@
           "basket_analysis",
           "item_correlation",
           "cross_sell_opportunities",
-          "basket_metrics"
+          "basket_metrics",
           "transaction_lookup"
         ],
         "analytics": [
