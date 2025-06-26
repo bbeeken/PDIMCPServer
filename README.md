@@ -135,3 +135,8 @@ To verify the MCP server can be created without starting the HTTP API run:
 ```bash
 python scripts/smoke_test_server.py
 ```
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+

@@ -7,6 +7,7 @@ name = "mcp-pdi-server"
 version = "1.0.0"
 description = "MCP server for PDI sales analytics"
 readme = "README.md"
+license = {file = "LICENSE"}
 requires-python = ">=3.8"
 dependencies = [
     "mcp>=1.9.4",
