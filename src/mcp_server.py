@@ -16,7 +16,6 @@ def create_server() -> Server:
     server = Server("mcp-pdi-sales")
 
     tools: List[Tool] = TOOLS
-    server.tools = tools
 
 
 
