@@ -6,7 +6,7 @@ A Model Context Protocol (MCP) server providing real-time sales analytics tools 
 
 - **Real-time Sales Data**: Query transaction-level data from V_LLM_SalesFact
 - **Market Basket Analysis**: Discover item associations and purchase patterns
-- **Sales Analytics**: Trends, summaries, and performance metrics
+- **Sales Analytics**: Daily reports, trends, summaries, and performance metrics
 - **MCP Compliant**: Works with any MCP-compatible client
 
 ## MCP tools
