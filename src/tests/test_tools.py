@@ -19,6 +19,7 @@ def load_server(monkeypatch):
         ("src.tools.basket.item_correlation", "item_correlation_tool"),
         ("src.tools.basket.cross_sell", "cross_sell_opportunities_tool"),
         ("src.tools.analytics.hourly_sales", "hourly_sales_tool"),
+        ("src.tools.analytics.daily_report", "daily_report_tool"),
         ("src.tools.analytics.sales_gaps", "sales_gaps_tool"),
         ("src.tools.analytics.year_over_year", "year_over_year_tool"),
         ("src.tools.item_lookup", "item_lookup_tool"),
@@ -42,7 +43,7 @@ def test_tool_registration(monkeypatch):
     mcp_server = load_server(monkeypatch)
     server = mcp_server.create_server()
     assert hasattr(server, "run")
-    assert len(server.tools) == 13
+    assert len(server.tools) == 14
     assert all(hasattr(t, "name") for t in server.tools)
 
 

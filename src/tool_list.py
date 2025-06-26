@@ -10,6 +10,7 @@ from .tools.basket.cross_sell import cross_sell_opportunities_tool
 from .tools.analytics.hourly_sales import hourly_sales_tool
 from .tools.analytics.sales_gaps import sales_gaps_tool
 from .tools.analytics.year_over_year import year_over_year_tool
+from .tools.analytics.daily_report import daily_report_tool
 from .tools.item_lookup import item_lookup_tool
 from .tools.site_lookup import site_lookup_tool
 from .tools.get_today_date import get_today_date_tool
@@ -23,6 +24,7 @@ TOOLS: list[Tool] = [
     item_correlation_tool,
     cross_sell_opportunities_tool,
     hourly_sales_tool,
+    daily_report_tool,
     sales_gaps_tool,
     year_over_year_tool,
     item_lookup_tool,
