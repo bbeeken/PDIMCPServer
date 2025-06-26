@@ -59,7 +59,7 @@ def test_fastapi_list_tools(monkeypatch):
     client = TestClient(app)
     resp = client.get("/tools")
     assert resp.status_code == 200
-    assert len(resp.json()) == 18
+    assert len(resp.json()) == 19
 
 
 def test_fastapi_call_tool(monkeypatch):

@@ -27,6 +27,7 @@ def load_server(monkeypatch):
         ("src.tools.analytics.daily_report", "daily_report_tool"),
         ("src.tools.analytics.sales_gaps", "sales_gaps_tool"),
         ("src.tools.analytics.year_over_year", "year_over_year_tool"),
+        ("src.tools.analytics.sales_forecast", "sales_forecast_tool"),
         ("src.tools.item_lookup", "item_lookup_tool"),
         ("src.tools.site_lookup", "site_lookup_tool"),
         ("src.tools.get_today_date", "get_today_date_tool"),
@@ -48,7 +49,7 @@ def test_tool_registration(monkeypatch):
     mcp_server = load_server(monkeypatch)
     server = mcp_server.create_server()
     assert hasattr(server, "run")
-    assert len(server.tools) == 18
+    assert len(server.tools) == 19
     assert all(hasattr(t, "name") for t in server.tools)
 
 

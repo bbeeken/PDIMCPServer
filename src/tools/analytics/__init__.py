@@ -8,6 +8,7 @@ from .product_velocity import product_velocity_tool
 from .low_movement import low_movement_tool
 from .sales_gaps import sales_gaps_tool
 from .year_over_year import year_over_year_tool
+from .sales_forecast import sales_forecast_tool
 
 __all__ = [
     "daily_report_tool",
@@ -18,4 +19,5 @@ __all__ = [
     "low_movement_tool",
     "sales_gaps_tool",
     "year_over_year_tool",
+    "sales_forecast_tool",
 ]
