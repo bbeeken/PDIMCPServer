@@ -59,6 +59,10 @@ number of results.
 Identify items selling below a `threshold` between `start_date` and `end_date`.
 Optionally filter by `site_id`.
 
+### `sales_forecast`
+
+Forecast daily sales for `horizon` days beyond the selected range using a Prophet model. Provide `start_date` and `end_date` for the training data.
+
 ## Installation
 
 1. Clone the repository:

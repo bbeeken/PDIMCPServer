@@ -32,7 +32,8 @@
           "product_velocity",
           "low_movement",
           "sales_gaps",
-          "year_over_year"
+          "year_over_year",
+          "sales_forecast"
         ]
       }
     }
