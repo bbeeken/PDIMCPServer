@@ -84,7 +84,11 @@ async def site_lookup_impl(
 # ────────────────────────────────────────────────────────────────
 site_lookup_tool = Tool(
     name="site_lookup",
-    description="Look up site information from dbo.V_LLM_Sites",
+    description=(
+        "Retrieve site information from dbo.V_LLM_Sites. Supports filtering by "
+        "exact Site_id or by partial name, city or state and returns address, "
+        "coordinates and timezone."
+    ),
     inputSchema={
         "type": "object",
         "properties": {

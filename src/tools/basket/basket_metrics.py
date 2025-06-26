@@ -41,7 +41,10 @@ async def basket_metrics_impl(
 
 basket_metrics_tool = Tool(
     name="basket_metrics",
-    description="Calculate basket metrics like average items per transaction",
+    description=(
+        "Calculate overall basket metrics such as transaction count, total "
+        "quantity, sales and the average number of items per transaction."
+    ),
     inputSchema={
         "type": "object",
         "properties": {

@@ -42,7 +42,10 @@ async def low_movement_impl(
 
 low_movement_tool = Tool(
     name="low_movement",
-    description="List items with low sales volume",
+    description=(
+        "Identify items whose quantity sold falls below the given threshold "
+        "during the period. Useful for analysing slow-moving inventory."
+    ),
     inputSchema={
         "type": "object",
         "properties": {

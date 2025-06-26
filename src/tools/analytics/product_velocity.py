@@ -43,7 +43,11 @@ async def product_velocity_impl(
 
 product_velocity_tool = Tool(
     name="product_velocity",
-    description="List top selling items for a period",
+    description=(
+        "List the fastest selling items within the date range ranked by total "
+        "quantity. Optionally filter to a specific site and control the number "
+        "of results."
+    ),
     inputSchema={
         "type": "object",
         "properties": {

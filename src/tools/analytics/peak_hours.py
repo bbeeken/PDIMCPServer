@@ -46,7 +46,10 @@ async def peak_hours_impl(
 
 peak_hours_tool = Tool(
     name="peak_hours",
-    description="Find the hours of day with the highest sales volume",
+    description=(
+        "Return the hours of the day that generate the greatest sales totals. "
+        "Can limit results and filter by site to identify peak trading periods."
+    ),
     inputSchema={
         "type": "object",
         "properties": {

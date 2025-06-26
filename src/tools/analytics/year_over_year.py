@@ -125,7 +125,10 @@ async def year_over_year_impl(
 # ────────────────────────────────────────────────────────────────
 year_over_year_tool = Tool(
     name="year_over_year",
-    description="Compare a period's sales with the same period last year",
+    description=(
+        "Compare totals for the selected period with the same date range in the "
+        "prior year and report the percent change."
+    ),
     inputSchema={
         "type": "object",
         "properties": {

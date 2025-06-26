@@ -108,7 +108,11 @@ async def sales_summary_impl(
 
 sales_summary_tool = Tool(
     name="sales_summary",
-    description="Generate aggregated sales metrics with flexible grouping",
+    description=(
+        "Aggregate sales metrics such as transactions, quantity and total sales. "
+        "Use the `group_by` option to summarize by date, hour, site, category or "
+        "department."
+    ),
     inputSchema={
         "type": "object",
         "properties": {

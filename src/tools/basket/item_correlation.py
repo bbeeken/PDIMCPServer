@@ -138,7 +138,10 @@ async def item_correlation_impl(
 
 item_correlation_tool = Tool(
     name="item_correlation",
-    description="Find items frequently bought together with a specific item",
+    description=(
+        "Analyse transactions containing a target item and identify other items "
+        "that commonly appear in the same basket. Useful for bundle planning."
+    ),
     inputSchema={
         "type": "object",
         "properties": {

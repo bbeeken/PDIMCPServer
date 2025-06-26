@@ -98,7 +98,11 @@ async def query_sales_realtime_impl(
 # Tool definition
 query_sales_realtime_tool = Tool(
     name="query_sales_realtime",
-    description="Query real-time sales transaction data with flexible filtering",
+    description=(
+        "Retrieve transaction-level rows from V_LLM_SalesFact for a date range. "
+        "Optional filters let you narrow by item, site, category or minimum "
+        "sale amount for ad-hoc analysis."
+    ),
     inputSchema={
         "type": "object",
         "properties": {

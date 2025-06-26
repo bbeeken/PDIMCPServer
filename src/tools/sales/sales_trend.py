@@ -95,7 +95,11 @@ async def sales_trend_impl(
 # Tool definition
 sales_trend_tool = Tool(
     name="sales_trend",
-    description="Analyze sales trends over time",
+    description=(
+        "Generate time-based trend data for sales, quantity or transactions. "
+        "Supports daily, weekly, monthly or hourly intervals with optional site "
+        "and category filters."
+    ),
     inputSchema={
         "type": "object",
         "properties": {
