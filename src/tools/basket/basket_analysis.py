@@ -116,7 +116,11 @@ async def basket_analysis_impl(
 
 basket_analysis_tool = Tool(
     name="basket_analysis",
-    description="Find frequently bought together items with support, confidence, and lift metrics",
+    description=(
+        "Perform market-basket analysis to discover item pairs that sell "
+        "together. Calculates support, confidence and lift to highlight strong "
+        "associations."
+    ),
     inputSchema={
         "type": "object",
         "properties": {

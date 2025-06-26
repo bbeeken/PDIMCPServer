@@ -50,7 +50,10 @@ async def sales_anomalies_impl(
 
 sales_anomalies_tool = Tool(
     name="sales_anomalies",
-    description="Highlight days with abnormal sales totals",
+    description=(
+        "Highlight dates where total sales deviate from the average by more "
+        "than a configurable number of standard deviations."
+    ),
     inputSchema={
         "type": "object",
         "properties": {

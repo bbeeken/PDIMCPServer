@@ -87,7 +87,11 @@ async def cross_sell_opportunities_impl(
 # ────────────────────────────────────────────────────────────────
 cross_sell_opportunities_tool = Tool(
     name="cross_sell_opportunities",
-    description="Recommend items frequently purchased with a specified item",
+    description=(
+        "Identify the products most often purchased in the same transactions as"
+        " the target item. Helps surface cross-selling and merchandising oppor-"
+        "tunities and can be limited to a single site."
+    ),
     inputSchema={
         "type": "object",
         "properties": {

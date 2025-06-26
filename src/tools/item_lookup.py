@@ -43,7 +43,10 @@ async def item_lookup_impl(
 
 item_lookup_tool = Tool(
     name="item_lookup",
-    description="Look up items in dbo.Product by ID or description",
+    description=(
+        "Search dbo.Product by item ID or partial description to retrieve "
+        "category, department, UPC and size details."
+    ),
     inputSchema={
         "type": "object",
         "properties": {

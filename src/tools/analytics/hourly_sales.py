@@ -38,7 +38,10 @@ async def hourly_sales_impl(
 
 hourly_sales_tool = Tool(
     name="hourly_sales",
-    description="Aggregate sales by hour for a given date range",
+    description=(
+        "Summarise transaction counts, quantities and sales totals for each hour"
+        " of the day within the selected date range."
+    ),
     inputSchema={
         "type": "object",
         "properties": {

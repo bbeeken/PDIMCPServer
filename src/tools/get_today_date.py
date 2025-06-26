@@ -11,7 +11,10 @@ async def get_today_date_impl() -> Dict[str, Any]:
 
 get_today_date_tool = Tool(
     name="get_today_date",
-    description="Get today's date in YYYY-MM-DD format",
+    description=(
+        "Return today's date in YYYY-MM-DD ISO format. Useful for constructing "
+        "relative date ranges."
+    ),
     inputSchema={
         "type": "object",
         "properties": {},

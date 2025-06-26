@@ -50,7 +50,11 @@ async def top_items_impl(
 
 top_items_tool = Tool(
     name="top_items",
-    description="Get top selling items for a date range with optional filters",
+    description=(
+        "Return the best performing items for a period ranked by sales, "
+        "quantity or transaction count. Supports site and category filters and "
+        "a limit on the number of items returned."
+    ),
     inputSchema={
         "type": "object",
         "properties": {

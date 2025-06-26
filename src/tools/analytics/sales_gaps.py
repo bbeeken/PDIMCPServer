@@ -71,7 +71,10 @@ async def sales_gaps_impl(
 # ───────────────────────────────────────────────────────────────
 sales_gaps_tool = Tool(
     name="sales_gaps",
-    description="List calendar dates in a range that have no sales rows",
+    description=(
+        "List calendar days within the range that have no sales records in "
+        "V_LLM_SalesFact. Useful for spotting data outages or store closures."
+    ),
     inputSchema={
         "type": "object",
         "properties": {
