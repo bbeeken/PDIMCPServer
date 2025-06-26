@@ -9,6 +9,32 @@ A Model Context Protocol (MCP) server providing real-time sales analytics tools 
 - **Sales Analytics**: Trends, summaries, and performance metrics
 - **MCP Compliant**: Works with any MCP-compatible client
 
+## MCP tools
+
+The API exposes each analytic function as its own tool. Tools may be accessed
+via the `/mcp` SSE endpoint or directly by sending JSON to the corresponding
+POST route.
+
+### `sales_summary`
+
+Aggregate KPIs between two dates. Use the `group_by` array to break down the
+results by `date`, `hour`, `site`, `category`, or `department`.
+
+### `sales_trend`
+
+Return totals over time using an `interval` of `daily`, `weekly`, `monthly`, or
+`hourly`. Optional `site_id` and `category` filters narrow the results.
+
+### `hourly_sales`
+
+Summarise quantities, sales totals and transaction counts for each hour within a
+date range. Accepts an optional `site_id` filter.
+
+### `daily_report`
+
+Generate a simple per-day report of sales and transaction totals. Call
+`POST /daily_report` with `start_date` and `end_date` like the other tools.
+
 ## Installation
 
 1. Clone the repository:
