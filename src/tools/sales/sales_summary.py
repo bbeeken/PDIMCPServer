@@ -30,6 +30,8 @@ class Params:
     group_by:   List[str]
     site_id:    Optional[int]
     category:   Optional[str]
+    item_id:    Optional[int]
+    item_name:  Optional[str]
 
 async def sales_summary_impl(
     start_date: str,
@@ -37,6 +39,8 @@ async def sales_summary_impl(
     group_by:   Optional[List[str]] = None,
     site_id:    Optional[int]       = None,
     category:   Optional[str]       = None,
+    item_id:    Optional[int]       = None,
+    item_name:  Optional[str]       = None,
 ) -> Dict[str, Any]:
     """Aggregate sales KPIs with flexible grouping."""
     start_date, end_date = validate_date_range(start_date, end_date)
@@ -46,6 +50,8 @@ async def sales_summary_impl(
         group_by   = group_by or [],
         site_id    = site_id if site_id and site_id > 0 else None,
         category   = category.strip() if category else None,
+        item_id    = item_id if item_id and item_id > 0 else None,
+        item_name  = item_name.strip() if item_name else None,
     )
 
     illegal = set(p.group_by) - _ALLOWED_GROUPS.keys()
@@ -78,6 +84,7 @@ async def sales_summary_impl(
         WHERE  SaleDate BETWEEN :start_date AND :end_date
         {"AND  SiteID = :site_id"        if p.site_id   else ""}
         {"AND  Category LIKE :category"  if p.category else ""}
+        {"AND  ItemID = :item_id"        if p.item_id   else ("AND  ItemName LIKE :item_name" if p.item_name else "")}
         {group_sql}
         {order_sql}
     """)
@@ -87,6 +94,8 @@ async def sales_summary_impl(
         "end_date"  : p.end_date,
         **({"site_id": p.site_id}           if p.site_id   else {}),
         **({"category": f"%{p.category}%"} if p.category else {}),
+        **({"item_id": p.item_id}           if p.item_id else {}),
+        **({"item_name": f"%{p.item_name}%"} if p.item_name and not p.item_id else {}),
     }
 
     try:
@@ -100,7 +109,12 @@ async def sales_summary_impl(
         meta = {
             "date_range": f"{p.start_date} → {p.end_date}",
             "grouping"  : p.group_by or "overall",
-            "filters"   : {"site_id": p.site_id, "category": p.category},
+            "filters"   : {
+                "site_id": p.site_id,
+                "category": p.category,
+                "item_id": p.item_id,
+                "item_name": p.item_name,
+            },
         }
         return create_tool_response(rows, str(stmt), bind, meta)
     except Exception as exc:   # noqa: BLE001
@@ -111,7 +125,7 @@ sales_summary_tool = Tool(
     description=(
         "Aggregate sales metrics such as transactions, quantity and total sales. "
         "Use the `group_by` option to summarize by date, hour, site, category or "
-        "department."
+        "department. Supports optional item ID or name filters."
     ),
     inputSchema={
         "type": "object",
@@ -124,6 +138,8 @@ sales_summary_tool = Tool(
             },
             "site_id":  {"type": "integer", "minimum": 0},
             "category": {"type": "string"},
+            "item_id":  {"type": "integer", "minimum": 0},
+            "item_name": {"type": "string"},
         },
         "required": ["start_date", "end_date"],
         "additionalProperties": False,

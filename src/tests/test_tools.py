@@ -59,3 +59,11 @@ def test_daily_report_schema():
     assert "item_id" in props
     assert "item_name" in props
     assert "category" in props
+
+
+def test_sales_summary_schema():
+    from src.tools.sales.sales_summary import sales_summary_tool
+
+    props = sales_summary_tool.inputSchema["properties"]
+    assert "item_id" in props
+    assert "item_name" in props
