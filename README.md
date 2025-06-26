@@ -63,6 +63,10 @@ Optionally filter by `site_id`.
 
 Forecast daily sales for `horizon` days beyond the selected range using a Prophet model. Provide `start_date` and `end_date` for the training data.
 
+### `basket_metrics`
+
+Compute overall basket-level metrics like transaction counts, total quantity, total sales, and the average number of items per transaction between `start_date` and `end_date`. Optionally filter by `site_id`.
+
 ## Installation
 
 1. Clone the repository:
