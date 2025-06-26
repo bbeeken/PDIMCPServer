@@ -20,6 +20,7 @@ def load_app(monkeypatch):
         ("src.tools.basket.basket_analysis", "basket_analysis_tool"),
         ("src.tools.basket.item_correlation", "item_correlation_tool"),
         ("src.tools.basket.cross_sell", "cross_sell_opportunities_tool"),
+        ("src.tools.analytics.daily_report", "daily_report_tool"),
         ("src.tools.analytics.hourly_sales", "hourly_sales_tool"),
         ("src.tools.analytics.sales_gaps", "sales_gaps_tool"),
         ("src.tools.analytics.year_over_year", "year_over_year_tool"),
@@ -53,7 +54,7 @@ def test_fastapi_list_tools(monkeypatch):
     client = TestClient(app)
     resp = client.get("/tools")
     assert resp.status_code == 200
-    assert len(resp.json()) == 13
+    assert len(resp.json()) == 14
 
 
 def test_fastapi_call_tool(monkeypatch):

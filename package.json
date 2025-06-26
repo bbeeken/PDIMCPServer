@@ -26,6 +26,7 @@
           "cross_sell_opportunities"
         ],
         "analytics": [
+          "daily_report",
           "hourly_sales",
           "sales_gaps",
           "year_over_year"
