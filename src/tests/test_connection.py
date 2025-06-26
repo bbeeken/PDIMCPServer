@@ -6,12 +6,22 @@ import types
 def load_connection(monkeypatch):
     """Load ``src.db.connection`` using an in-memory SQLite engine."""
     monkeypatch.setenv("DATABASE_URL", "sqlite:///:memory:")
+    monkeypatch.setenv("DB_USERNAME", "x")
+    monkeypatch.setenv("DB_PASSWORD", "x")
+    monkeypatch.setenv("DB_SERVER", "x")
+    monkeypatch.setenv("DB_DATABASE", "x")
 
     dotenv = types.ModuleType("dotenv")
     dotenv.load_dotenv = lambda: None
     monkeypatch.setitem(sys.modules, "dotenv", dotenv)
 
-    importlib.reload(importlib.import_module("src.db.engine"))
+    engine = importlib.reload(importlib.import_module("src.db.engine"))
+    from sqlalchemy import create_engine as sa_create_engine
+    from sqlalchemy.orm import sessionmaker
+
+    engine.engine = sa_create_engine("sqlite:///:memory:")
+    engine.SessionLocal = sessionmaker(bind=engine.engine, autocommit=False, autoflush=False)
+
     importlib.reload(importlib.import_module("src.db.session"))
     module = importlib.reload(importlib.import_module("src.db.connection"))
     return module

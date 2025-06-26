@@ -18,6 +18,7 @@ def load_server(monkeypatch):
         ("src.tools.basket.basket_analysis", "basket_analysis_tool"),
         ("src.tools.basket.item_correlation", "item_correlation_tool"),
         ("src.tools.basket.cross_sell", "cross_sell_opportunities_tool"),
+        ("src.tools.analytics.daily_report", "daily_report_tool"),
         ("src.tools.analytics.hourly_sales", "hourly_sales_tool"),
         ("src.tools.analytics.daily_report", "daily_report_tool"),
         ("src.tools.analytics.sales_gaps", "sales_gaps_tool"),
