@@ -8,6 +8,7 @@ from .tools.basket.basket_analysis import basket_analysis_tool
 from .tools.basket.item_correlation import item_correlation_tool
 from .tools.basket.cross_sell import cross_sell_opportunities_tool
 from .tools.basket.basket_metrics import basket_metrics_tool
+from .tools.basket.transaction_lookup import transaction_lookup_tool
 from .tools.analytics.daily_report import daily_report_tool
 from .tools.analytics.hourly_sales import hourly_sales_tool
 from .tools.analytics.peak_hours import peak_hours_tool
@@ -30,6 +31,7 @@ TOOLS: list[Tool] = [
     item_correlation_tool,
     cross_sell_opportunities_tool,
     basket_metrics_tool,
+    transaction_lookup_tool,
     daily_report_tool,
     hourly_sales_tool,
     peak_hours_tool,

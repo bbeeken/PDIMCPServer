@@ -4,11 +4,16 @@ import os
 import logging
 from urllib.parse import quote_plus
 
+from dotenv import load_dotenv
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import declarative_base
 
 logger = logging.getLogger(__name__)
+
+# Load environment variables from a .env file if present
+load_dotenv()
 
 # Get environment variables
 DB_USERNAME = os.getenv('DB_USERNAME')
