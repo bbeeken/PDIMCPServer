@@ -80,10 +80,7 @@ Analyse baskets containing a target item to surface other products that frequent
 
 ### `transaction_lookup`
 
-Return the line items, quantities and totals for a specific `transaction_id`. Example: `transaction_id=123456`.
-### `transaction_lookup`
-
-Return all line items associated with a given `transaction_id`. An optional `site_id` parameter restricts results to a specific location.
+Return the line items, quantities and totals for a specific `transaction_id`. An optional `site_id` parameter restricts results to a specific location.
  
  
 
