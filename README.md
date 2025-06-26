@@ -63,6 +63,10 @@ Optionally filter by `site_id`.
 
 Forecast daily sales for `horizon` days beyond the selected range using a Prophet model. Provide `start_date` and `end_date` for the training data.
 
+### `transaction_lookup`
+
+Return all line items associated with a given `transaction_id`. An optional `site_id` parameter restricts results to a specific location.
+
 ## Installation
 
 1. Clone the repository:
