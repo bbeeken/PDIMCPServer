@@ -69,6 +69,7 @@ Forecast daily sales for `horizon` days beyond the selected range using a Prophe
 Compute overall basket-level metrics like transaction counts, total quantity, total sales, and the average number of items per transaction between `start_date` and `end_date`. Optionally filter by `site_id`.
 
 
+
 ### `cross_sell_opportunities`
 
 Identify the items most often bought alongside a given product. Example parameters: `item_id=100`, `start_date="2024-01-01"`, `end_date="2024-01-31"`, `site_id=1`, `top_n=5`.

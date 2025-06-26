@@ -25,7 +25,6 @@
           "cross_sell_opportunities",
           "basket_metrics"
           "transaction_lookup"
-
         ],
         "analytics": [
           "daily_report",
