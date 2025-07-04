@@ -98,8 +98,8 @@ cd mcp-pdi-server
 Create a `.env` file based on `.env.example` and adjust the connection
 settings. The variables `DB_SERVER`, `DB_DATABASE`, `DB_USERNAME`, and
 `DB_PASSWORD` configure the SQL Server connection used by the application.
-`DATABASE_URL` combines these into a standard SQLAlchemy URL using the
-`pyodbc` driver ("ODBC Driver 18 for SQL Server" by default). Additional options like `POOL_SIZE` and `MAX_OVERFLOW`
+These values are used to construct the SQLAlchemy `DATABASE_URL` automatically
+with the `pyodbc` driver ("ODBC Driver 18 for SQL Server" by default). Additional options like `POOL_SIZE` and `MAX_OVERFLOW`
 control connection pooling. See the example file for the full list of
 supported variables.
 
@@ -151,6 +151,24 @@ The frontend also includes options for viewing charts and exporting data:
   Use the graph toggle to switch between tabular and visual views.
 - **CSV Export** – Each table includes a **Download CSV** button
   for saving the query results for further analysis.
+
+## Docker
+
+A `Dockerfile` and `docker-compose.yml` are provided for containerised
+deployment. Build the image with:
+
+```bash
+docker build -t mcp-pdi-server .
+```
+
+Create a `.env` file (see `.env.example`) and run:
+
+```bash
+docker compose up
+```
+
+The API will be available on `http://localhost:8000` and the Streamlit
+interface on `http://localhost:8501`.
 
 ## Running tests
 
