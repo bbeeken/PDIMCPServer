@@ -152,6 +152,19 @@ The frontend also includes options for viewing charts and exporting data:
 - **CSV Export** – Each table includes a **Download CSV** button
   for saving the query results for further analysis.
 
+## Running tests
+
+Install the dependencies, including the `mcp` and `httpx` packages, and run the
+test suite with `pytest`:
+
+```bash
+pip install -r requirements.txt
+pip install mcp httpx
+pytest
+```
+
+Running `./setup.sh` will also install all required packages.
+
 
 ## Smoke testing
 
