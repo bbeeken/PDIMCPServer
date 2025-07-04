@@ -10,13 +10,14 @@ from ...db.connection import execute_query
 from ...db.models import SALES_FACT_VIEW
 from ..utils import validate_date_range, create_tool_response
 
+
 # ───────────────────────────────────────────────────────────────
 # Implementation
 # ───────────────────────────────────────────────────────────────
 async def sales_gaps_impl(
     start_date: str,
-    end_date:   str,
-    site_id:    Optional[int] = 0,   # 0 ⇒ all sites
+    end_date: str,
+    site_id: Optional[int] = 0,  # 0 ⇒ all sites
 ) -> Dict[str, Any]:
     """
     Return a list of calendar dates in the range [start_date, end_date]
@@ -37,7 +38,7 @@ async def sales_gaps_impl(
 
     params: Dict[str, Any] = {
         "start_date": start_date,
-        "end_date":   end_date,
+        "end_date": end_date,
     }
     if site_id and site_id > 0:
         params["site_id"] = site_id
@@ -48,7 +49,7 @@ async def sales_gaps_impl(
 
         # Generate full date range and find gaps
         start_dt = datetime.strptime(start_date, "%Y-%m-%d").date()
-        end_dt   = datetime.strptime(end_date,   "%Y-%m-%d").date()
+        end_dt = datetime.strptime(end_date, "%Y-%m-%d").date()
 
         gap_days: List[str] = []
         cur = start_dt
@@ -66,6 +67,7 @@ async def sales_gaps_impl(
     except Exception as exc:  # noqa: BLE001
         return create_tool_response([], sql, params, error=str(exc))
 
+
 # ───────────────────────────────────────────────────────────────
 # Tool registration
 # ───────────────────────────────────────────────────────────────
@@ -79,8 +81,8 @@ sales_gaps_tool = Tool(
         "type": "object",
         "properties": {
             "start_date": {"type": "string", "format": "date"},
-            "end_date":   {"type": "string", "format": "date"},
-            "site_id":    {
+            "end_date": {"type": "string", "format": "date"},
+            "site_id": {
                 "type": "integer",
                 "minimum": 0,
                 "default": 0,

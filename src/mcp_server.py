@@ -10,15 +10,11 @@ from mcp.types import Tool, TextContent
 from .tool_list import TOOLS
 
 
-
 def create_server() -> Server:
     """Create and configure the MCP server."""
     server = Server("mcp-pdi-sales")
 
     tools: List[Tool] = TOOLS
-
-
-
 
     @server.list_tools()
     async def list_tools() -> List[Tool]:
@@ -65,6 +61,7 @@ async def run_server() -> None:
             write_stream,
             server.create_initialization_options(),
         )
+
 
 if __name__ == "__main__":  # pragma: no cover - manual run
     import asyncio

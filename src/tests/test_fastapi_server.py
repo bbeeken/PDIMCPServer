@@ -41,7 +41,9 @@ def load_app(monkeypatch):
 
         return impl
 
-    item_schema = importlib.import_module("src.tools.item_lookup").item_lookup_tool.inputSchema
+    item_schema = importlib.import_module(
+        "src.tools.item_lookup"
+    ).item_lookup_tool.inputSchema
 
     for path, attr in imports:
         mod = types.ModuleType(path)
@@ -79,7 +81,6 @@ def test_reject_unknown_parameters(monkeypatch):
     assert resp.status_code == 422
 
 
-
 def test_item_lookup_valid(monkeypatch):
     app = load_app(monkeypatch)
     client = TestClient(app)
@@ -95,12 +96,12 @@ def test_transaction_lookup_call(monkeypatch):
     body = resp.json()
     assert body["result"] == "transaction_lookup"
 
+
 def test_openapi_examples(monkeypatch):
     app = load_app(monkeypatch)
     client = TestClient(app)
     spec = client.get("/openapi.json").json()
-    item_lookup_schema = (
-        spec["paths"]["/item_lookup"]["post"]["requestBody"]["content"]["application/json"]["schema"]
-    )
+    item_lookup_schema = spec["paths"]["/item_lookup"]["post"]["requestBody"][
+        "content"
+    ]["application/json"]["schema"]
     assert "example" in item_lookup_schema
-

@@ -183,6 +183,10 @@ pytest
 
 Running `./setup.sh` will also install all required packages.
 
+## Code style
+
+This project uses [black](https://black.readthedocs.io/) for Python formatting. Run `scripts/check_format.sh` before committing or `black .` to format the code. CI also runs `black --check` to ensure consistency.
+
 
 ## Smoke testing
 

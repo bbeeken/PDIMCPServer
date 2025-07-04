@@ -48,10 +48,10 @@ async def year_over_year_impl(
     site_id_int = _coerce_site(site_id)
 
     start_dt = datetime.strptime(start_date, "%Y-%m-%d").date()
-    end_dt   = datetime.strptime(end_date,   "%Y-%m-%d").date()
+    end_dt = datetime.strptime(end_date, "%Y-%m-%d").date()
 
     prev_start = (start_dt - relativedelta(years=1)).isoformat()
-    prev_end   = (end_dt   - relativedelta(years=1)).isoformat()
+    prev_end = (end_dt - relativedelta(years=1)).isoformat()
 
     base_sql = f"""
     SELECT
@@ -99,15 +99,15 @@ async def year_over_year_impl(
     }
 
     data = {
-        "current_period":   current,
-        "previous_period":  previous,
-        "change":           change,
+        "current_period": current,
+        "previous_period": previous,
+        "change": change,
     }
 
     metadata = {
-        "current_range":  f"{start_date} to {end_date}",
+        "current_range": f"{start_date} to {end_date}",
         "previous_range": f"{prev_start} to {prev_end}",
-        "site_id":        site_id_int,
+        "site_id": site_id_int,
     }
 
     debug_sql = (
@@ -133,7 +133,7 @@ year_over_year_tool = Tool(
         "type": "object",
         "properties": {
             "start_date": {"type": "string", "format": "date"},
-            "end_date":   {"type": "string", "format": "date"},
+            "end_date": {"type": "string", "format": "date"},
             "site_id": {
                 "type": "integer",
                 "minimum": 0,

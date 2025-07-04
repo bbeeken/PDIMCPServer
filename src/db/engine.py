@@ -16,21 +16,25 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 # Get environment variables
-DB_USERNAME = os.getenv('DB_USERNAME')
-DB_PASSWORD = os.getenv('DB_PASSWORD')
-DB_SERVER = os.getenv('DB_SERVER')
-DB_DATABASE = os.getenv('DB_DATABASE')
-ODBC_DRIVER = os.getenv('ODBC_DRIVER', 'ODBC Driver 18 for SQL Server')
-POOL_SIZE = int(os.getenv('POOL_SIZE', '10'))
-MAX_OVERFLOW = int(os.getenv('MAX_OVERFLOW', '20'))
+DB_USERNAME = os.getenv("DB_USERNAME")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_SERVER = os.getenv("DB_SERVER")
+DB_DATABASE = os.getenv("DB_DATABASE")
+ODBC_DRIVER = os.getenv("ODBC_DRIVER", "ODBC Driver 18 for SQL Server")
+POOL_SIZE = int(os.getenv("POOL_SIZE", "10"))
+MAX_OVERFLOW = int(os.getenv("MAX_OVERFLOW", "20"))
 
 # Validate required environment variables
 if not all([DB_USERNAME, DB_PASSWORD, DB_SERVER, DB_DATABASE]):
     missing = []
-    if not DB_USERNAME: missing.append('DB_USERNAME')
-    if not DB_PASSWORD: missing.append('DB_PASSWORD')
-    if not DB_SERVER: missing.append('DB_SERVER')
-    if not DB_DATABASE: missing.append('DB_DATABASE')
+    if not DB_USERNAME:
+        missing.append("DB_USERNAME")
+    if not DB_PASSWORD:
+        missing.append("DB_PASSWORD")
+    if not DB_SERVER:
+        missing.append("DB_SERVER")
+    if not DB_DATABASE:
+        missing.append("DB_DATABASE")
     raise ValueError(f"Missing required environment variables: {', '.join(missing)}")
 
 # URL-encode password to handle special characters
