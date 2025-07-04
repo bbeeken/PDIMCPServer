@@ -8,6 +8,7 @@ from mcp.types import Tool
 from ..db.connection import execute_query
 from .utils import create_tool_response
 
+
 # ────────────────────────────────────────────────────────────────
 # Implementation
 # ────────────────────────────────────────────────────────────────
@@ -19,8 +20,8 @@ async def site_lookup_impl(
     """
     Look up rows in **dbo.V_LLM_Sites**.
 
-    • `site_id`  > 0 → exact Site_id match  
-    • `site_id`  0 / None / "" → no Site_id filter (all sites)  
+    • `site_id`  > 0 → exact Site_id match
+    • `site_id`  0 / None / "" → no Site_id filter (all sites)
     • `description` finds partial matches in Site_desc, GPS_City, or GPS_State.
     """
 

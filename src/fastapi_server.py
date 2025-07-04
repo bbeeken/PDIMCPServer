@@ -62,7 +62,7 @@ def create_app() -> FastAPI:
         ) -> Any:
             # Check if this tool has any properties
             has_properties = bool(schema.get("properties", {}))
-            
+
             if has_properties:
                 # Tool has parameters - body is required
                 async def endpoint_with_body(
@@ -84,22 +84,24 @@ def create_app() -> FastAPI:
 
                     filtered_data = {k: v for k, v in data.items() if k in allowed}
                     return await t._implementation(**filtered_data)
-                
+
                 return endpoint_with_body
             else:
                 # Tool has no parameters - body is optional
                 async def endpoint_no_body(
-                    data: Optional[Dict[str, Any]] = Body(default={}, json_schema_extra=openapi_schema)
+                    data: Optional[Dict[str, Any]] = Body(
+                        default={}, json_schema_extra=openapi_schema
+                    )
                 ) -> Any:
                     if not hasattr(t, "_implementation"):
                         raise HTTPException(
                             status_code=500,
                             detail=f"Tool {t.name} has no implementation",
                         )
-                    
+
                     # For tools with no parameters, just call the implementation
                     return await t._implementation()
-                
+
                 return endpoint_no_body
 
         app.post(f"/{tool.name}", operation_id=tool.name)(

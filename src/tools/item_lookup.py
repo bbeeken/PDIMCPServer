@@ -25,6 +25,7 @@ from .utils import create_tool_response
 # Implementation
 # ────────────────────────────────────────────────────────────────
 
+
 async def item_lookup_impl(  # noqa: N802 – fixed by framework
     item_id: Optional[int] = None,
     description: Optional[str] = None,
@@ -42,8 +43,7 @@ async def item_lookup_impl(  # noqa: N802 – fixed by framework
         Maximum rows to return.
     """
 
-    sql = (
-        """
+    sql = """
         SELECT TOP (?)
                Item_ID         AS item_id,
                Item_Desc       AS description,
@@ -57,7 +57,6 @@ async def item_lookup_impl(  # noqa: N802 – fixed by framework
           AND  UPPER(Brand) NOT LIKE '%UNAUTH%'
           AND  UPPER(Brand) NOT LIKE '%DEAUTH%'
         """
-    )
     params: List[Any] = [limit]
 
     # ── Exact ID filter ─────────────────────────────────────────
@@ -128,4 +127,3 @@ item_lookup_tool = Tool(
 
 # Attach implementation
 item_lookup_tool._implementation = item_lookup_impl
-

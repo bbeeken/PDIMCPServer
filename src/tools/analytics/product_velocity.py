@@ -24,7 +24,11 @@ async def product_velocity_impl(
     FROM {SALES_FACT_VIEW}
     WHERE SaleDate BETWEEN :start_date AND :end_date
     """
-    params: Dict[str, Any] = {"limit": limit, "start_date": start_date, "end_date": end_date}
+    params: Dict[str, Any] = {
+        "limit": limit,
+        "start_date": start_date,
+        "end_date": end_date,
+    }
     if site_id is not None:
         sql += " AND SiteID = :site_id"
         params["site_id"] = site_id

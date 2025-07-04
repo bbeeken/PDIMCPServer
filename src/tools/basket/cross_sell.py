@@ -10,6 +10,7 @@ from mcp.types import Tool
 from ...db.connection import execute_query
 from ..utils import validate_date_range, create_tool_response
 
+
 # ────────────────────────────────────────────────────────────────
 # Implementation
 # ────────────────────────────────────────────────────────────────
@@ -17,7 +18,7 @@ async def cross_sell_opportunities_impl(
     item_id: int,
     start_date: str,
     end_date: str,
-    site_id: Optional[int] = 0,      # 0 → all sites
+    site_id: Optional[int] = 0,  # 0 → all sites
     top_n: int = 10,
 ) -> Dict[str, Any]:
     """
@@ -55,10 +56,10 @@ async def cross_sell_opportunities_impl(
     """
 
     params: Dict[str, Any] = {
-        "top_n":      top_n,
-        "item_id":    item_id,
+        "top_n": top_n,
+        "item_id": item_id,
         "start_date": start_date,
-        "end_date":   end_date,
+        "end_date": end_date,
     }
     if site_id and site_id > 0:
         params["site_id"] = site_id
@@ -68,7 +69,7 @@ async def cross_sell_opportunities_impl(
 
         # Cast numerics for JSON serialisation
         for r in rows:
-            r["total_qty"]   = float(r["total_qty"])
+            r["total_qty"] = float(r["total_qty"])
             r["total_sales"] = float(r["total_sales"])
 
         meta = {
@@ -79,8 +80,9 @@ async def cross_sell_opportunities_impl(
         }
         return create_tool_response(rows, sql, params, meta)
 
-    except Exception as exc:   # noqa: BLE001
+    except Exception as exc:  # noqa: BLE001
         return create_tool_response([], sql, params, error=str(exc))
+
 
 # ────────────────────────────────────────────────────────────────
 # Tool registration
@@ -95,10 +97,10 @@ cross_sell_opportunities_tool = Tool(
     inputSchema={
         "type": "object",
         "properties": {
-            "item_id":    {"type": "integer", "description": "Target item ID"},
-            "start_date": {"type": "string",  "format": "date"},
-            "end_date":   {"type": "string",  "format": "date"},
-            "site_id":    {
+            "item_id": {"type": "integer", "description": "Target item ID"},
+            "start_date": {"type": "string", "format": "date"},
+            "end_date": {"type": "string", "format": "date"},
+            "site_id": {
                 "type": "integer",
                 "minimum": 0,
                 "default": 0,

@@ -20,7 +20,9 @@ def load_connection(monkeypatch):
     from sqlalchemy.orm import sessionmaker
 
     engine.engine = sa_create_engine("sqlite:///:memory:")
-    engine.SessionLocal = sessionmaker(bind=engine.engine, autocommit=False, autoflush=False)
+    engine.SessionLocal = sessionmaker(
+        bind=engine.engine, autocommit=False, autoflush=False
+    )
 
     importlib.reload(importlib.import_module("src.db.session"))
     module = importlib.reload(importlib.import_module("src.db.connection"))
