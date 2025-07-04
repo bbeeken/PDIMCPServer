@@ -28,7 +28,6 @@ def load_app(monkeypatch):
         ("src.tools.analytics.sales_anomalies", "sales_anomalies_tool"),
         ("src.tools.analytics.product_velocity", "product_velocity_tool"),
         ("src.tools.analytics.low_movement", "low_movement_tool"),
-        ("src.tools.analytics.daily_report", "daily_report_tool"),
         ("src.tools.analytics.sales_gaps", "sales_gaps_tool"),
         ("src.tools.analytics.year_over_year", "year_over_year_tool"),
         ("src.tools.item_lookup", "item_lookup_tool"),
