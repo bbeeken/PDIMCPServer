@@ -152,6 +152,24 @@ The frontend also includes options for viewing charts and exporting data:
 - **CSV Export** – Each table includes a **Download CSV** button
   for saving the query results for further analysis.
 
+## Docker
+
+A `Dockerfile` and `docker-compose.yml` are provided for containerised
+deployment. Build the image with:
+
+```bash
+docker build -t mcp-pdi-server .
+```
+
+Create a `.env` file (see `.env.example`) and run:
+
+```bash
+docker compose up
+```
+
+The API will be available on `http://localhost:8000` and the Streamlit
+interface on `http://localhost:8501`.
+
 ## Running tests
 
 Install the dependencies, including the `mcp` and `httpx` packages, and run the
