@@ -20,7 +20,7 @@ DB_USERNAME = os.getenv('DB_USERNAME')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
 DB_SERVER = os.getenv('DB_SERVER')
 DB_DATABASE = os.getenv('DB_DATABASE')
-ODBC_DRIVER = os.getenv('ODBC_DRIVER', 'ODBC Driver 17 for SQL Server')
+ODBC_DRIVER = os.getenv('ODBC_DRIVER', 'ODBC Driver 18 for SQL Server')
 POOL_SIZE = int(os.getenv('POOL_SIZE', '10'))
 MAX_OVERFLOW = int(os.getenv('MAX_OVERFLOW', '20'))
 

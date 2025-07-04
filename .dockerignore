@@ -1,0 +1,22 @@
+.git
+__pycache__/
+*.py[cod]
+tests/
+# Additional unnecessary files and directories
+src/tests/
+.env
+.env.*
+*.egg-info/
+dist/
+build/
+node_modules/
+venv/
+env/
+ENV/
+.venv
+output/
+temp/
+*.log
+*.csv
+.vscode/
+.idea/
