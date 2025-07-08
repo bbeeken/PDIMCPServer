@@ -20,8 +20,8 @@ def format_date(date_input: Any) -> str:
                 return dt.strftime("%Y-%m-%d")
             except ValueError:
                 continue
-        # Return as-is if no format matches
-        return date_input
+        # If no format matches raise an error
+        raise ValueError(f"Invalid date format: {date_input}. Expected YYYY-MM-DD")
     elif isinstance(date_input, (date, datetime)):
         return date_input.strftime("%Y-%m-%d")
     else:
@@ -102,8 +102,11 @@ def create_tool_response(
 
 def validate_date_range(start_date: str, end_date: str) -> tuple[str, str]:
     """Validate and format date range"""
-    start = format_date(start_date)
-    end = format_date(end_date)
+    try:
+        start = format_date(start_date)
+        end = format_date(end_date)
+    except ValueError as exc:
+        raise ValueError(f"Invalid date range: {exc}") from exc
 
     # Validate dates
     start_dt = datetime.strptime(start, "%Y-%m-%d")
