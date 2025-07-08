@@ -83,7 +83,10 @@ def create_app() -> FastAPI:
                         )
 
                     filtered_data = {k: v for k, v in data.items() if k in allowed}
-                    return await t._implementation(**filtered_data)
+                    try:
+                        return await t._implementation(**filtered_data)
+                    except ValueError as exc:
+                        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
                 return endpoint_with_body
             else:
@@ -100,7 +103,10 @@ def create_app() -> FastAPI:
                         )
 
                     # For tools with no parameters, just call the implementation
-                    return await t._implementation()
+                    try:
+                        return await t._implementation()
+                    except ValueError as exc:
+                        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
                 return endpoint_no_body
 
