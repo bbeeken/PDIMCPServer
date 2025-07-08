@@ -114,10 +114,10 @@ Install the dependencies and start the HTTP API with `uvicorn`:
 
 ```bash
 pip install -r requirements.txt
-uvicorn src.fastapi_server:create_app --host 0.0.0.0 --port 8000 --reload
+uvicorn src.fastapi_server:create_app --host 0.0.0.0 --port 8006 --reload
 ```
 
-Set `MCP_API_URL` if the API is not running on the default `http://localhost:8000`.
+Set `MCP_API_URL` if the API is not running on the default `http://localhost:8006`.
 
 Each tool is exposed as its own endpoint (e.g. `POST /sales_summary`). The server
 also mounts a streaming SSE interface at `/mcp` using **fastapi-mcp**.
