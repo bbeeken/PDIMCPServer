@@ -33,6 +33,8 @@ def load_app(monkeypatch):
         ("src.tools.item_lookup", "item_lookup_tool"),
         ("src.tools.site_lookup", "site_lookup_tool"),
         ("src.tools.get_today_date", "get_today_date_tool"),
+        ("src.tools.tickets.ticket_sentiment", "ticket_sentiment_tool"),
+        ("src.tools.tickets.ticket_priority", "ticket_priority_tool"),
     ]
 
     def make_impl(name):
@@ -62,7 +64,7 @@ def test_fastapi_list_tools(monkeypatch):
     client = TestClient(app)
     resp = client.get("/tools")
     assert resp.status_code == 200
-    assert len(resp.json()) == 21
+    assert len(resp.json()) == 23
 
 
 def test_fastapi_call_tool(monkeypatch):
@@ -88,6 +90,20 @@ def test_item_lookup_valid(monkeypatch):
     assert resp.status_code == 200
 
 
+def test_ticket_sentiment_call(monkeypatch):
+    app = load_app(monkeypatch)
+    client = TestClient(app)
+    resp = client.post("/ticket_sentiment", json={"text": "great work"})
+    assert resp.status_code == 200
+
+
+def test_ticket_priority_call(monkeypatch):
+    app = load_app(monkeypatch)
+    client = TestClient(app)
+    resp = client.post("/ticket_priority", json={"text": "urgent issue"})
+    assert resp.status_code == 200
+
+
 def test_transaction_lookup_call(monkeypatch):
     app = load_app(monkeypatch)
     client = TestClient(app)
@@ -105,3 +121,7 @@ def test_openapi_examples(monkeypatch):
         "content"
     ]["application/json"]["schema"]
     assert "example" in item_lookup_schema
+    sentiment_schema = spec["paths"]["/ticket_sentiment"]["post"]["requestBody"][
+        "content"
+    ]["application/json"]["schema"]
+    assert "example" in sentiment_schema

@@ -21,6 +21,8 @@ from .tools.analytics.sales_forecast import sales_forecast_tool
 from .tools.item_lookup import item_lookup_tool
 from .tools.site_lookup import site_lookup_tool
 from .tools.get_today_date import get_today_date_tool
+from .tools.tickets.ticket_sentiment import ticket_sentiment_tool
+from .tools.tickets.ticket_priority import ticket_priority_tool
 
 TOOLS: list[Tool] = [
     query_sales_realtime_tool,
@@ -44,4 +46,6 @@ TOOLS: list[Tool] = [
     item_lookup_tool,
     site_lookup_tool,
     get_today_date_tool,
+    ticket_sentiment_tool,
+    ticket_priority_tool,
 ]
