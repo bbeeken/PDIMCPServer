@@ -32,6 +32,8 @@ def load_server(monkeypatch):
         ("src.tools.item_lookup", "item_lookup_tool"),
         ("src.tools.site_lookup", "site_lookup_tool"),
         ("src.tools.get_today_date", "get_today_date_tool"),
+        ("src.tools.tickets.ticket_sentiment", "ticket_sentiment_tool"),
+        ("src.tools.tickets.ticket_priority", "ticket_priority_tool"),
     ]
 
     from mcp.types import Tool
@@ -50,7 +52,7 @@ def test_tool_registration(monkeypatch):
     mcp_server = load_server(monkeypatch)
     server = mcp_server.create_server()
     assert hasattr(server, "run")
-    assert len(server.tools) == 21
+    assert len(server.tools) == 23
     assert all(hasattr(t, "name") for t in server.tools)
 
 
@@ -75,3 +77,15 @@ def test_basket_metrics_registered(monkeypatch):
     mcp_server = load_server(monkeypatch)
     server = mcp_server.create_server()
     assert any(t.name == "basket_metrics" for t in server.tools)
+
+
+def test_ticket_tools_schema():
+    from src.tools.tickets.ticket_sentiment import ticket_sentiment_tool
+    from src.tools.tickets.ticket_priority import ticket_priority_tool
+
+    sentiment_props = ticket_sentiment_tool.inputSchema["properties"]
+    priority_props = ticket_priority_tool.inputSchema["properties"]
+
+    assert set(sentiment_props) == {"text"}
+    assert set(priority_props) == {"text"}
+
